@@ -1,4 +1,6 @@
 import fetch from "node-fetch";
+import { JIRA_OPENAI_INIT_MESSAGES, JIRA_OPENAI_SYSTEM_MESSAGES, JIRA_OPENAI_SYSTEM_PROMPT } from "./constants/jira-openai-prompts.js";
+import { createChatCompletion, createCompletion } from "./openai.js";
 
 const configuration = {
   username: process.env.JIRA_USERNAME,
@@ -24,4 +26,16 @@ export const jira = (url, request, query) => {
 
 export const getCreateIssueMetaData = () => {
   return jira(`${apiUrl}/issue/createmeta`, { method: "GET" });
+}
+
+export const generateJiraChatRequests = async (actions) => {
+  const messages = [...JIRA_OPENAI_SYSTEM_MESSAGES, ...JIRA_OPENAI_INIT_MESSAGES, { role: "user", content: actions }];
+  const completion = await createChatCompletion(messages);
+  return completion.data.choices[0].message.content;
+}
+
+export const generateJiraRequests = async (actions) => {
+  const prompt = `${JIRA_OPENAI_SYSTEM_PROMPT} ${actions}`;
+  const completion = await createCompletion(prompt);
+  return completion.data.choices[0].text;
 }
