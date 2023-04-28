@@ -1,20 +1,45 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { generateJiraChatRequests } from "./jira.js";
+import {
+  bulkJira,
+  convertJiraErrorToSlackMessage,
+  convertSlackStateObjectToRequests,
+  convertTextMessageWithRequests,
+  generateJiraChatRequests,
+  pushJiraResponsesMessage,
+} from "./utils/jira.js";
+import {
+  convertContentObjectToSlackMessage,
+  sendErrorResponseMessage,
+  sendSuccessResponseMessage,
+} from "./utils/slack.js";
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/", async (req, res) => {
-  console.log("BODY", JSON.stringify(req.body));
   const actions = req.body.text;
-  const requests = await generateJiraChatRequests(actions);
-  res.json({ requests })
+  const message = await generateJiraChatRequests(actions);
+  const content = convertTextMessageWithRequests(message);
+  const slackMessage = convertContentObjectToSlackMessage(content);
+  res.json(slackMessage);
 });
 
-app.get("/", async (req, res) => {
-  res.send("OK")
+app.post("/interact", async (req, res) => {
+  try {
+    const payload = JSON.parse(req.body.payload);
+    const requests = convertSlackStateObjectToRequests(payload.state.values);
+    const responses = requests && (await bulkJira(requests));
+    sendSuccessResponseMessage(payload, responses);
+    pushJiraResponsesMessage(responses);
+  } catch (error) {
+    const errorText = error.request
+      ? convertJiraErrorToSlackMessage(error)
+      : `\`\`\`${JSON.stringify(error)}\`\`\``;
+    sendErrorResponseMessage(payload, errorText);
+  }
+  res.json({});
 });
 
 app.listen(3000, () => {
