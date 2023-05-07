@@ -46,7 +46,7 @@ export const bulkJira = (requests) => {
       jira(url, { method, body }, query)
         .then((response) => response.json())
         .then((response) => {
-          if (response.errors)
+          if (response.errors || response.errorMessages)
             return Promise.reject({
               request: {
                 url,
@@ -54,7 +54,10 @@ export const bulkJira = (requests) => {
                 body,
                 query,
               },
-              error: response.errors,
+              error: [
+                ...(response.errors || []),
+                ...(response.errorMessages || [])
+              ],
             });
           return response;
         })
@@ -85,6 +88,7 @@ export const generateJiraChatRequests = async (actions) => {
   pushMessages([{ role: "user", content: actions }]);
   const completion = await createChatCompletion(messages);
   pushMessages([completion.data.choices[0].message]);
+  console.log(prettyPrintJSON(messages));
   return completion.data.choices[0].message.content;
 };
 

@@ -4,6 +4,7 @@ import {
   SLACK_ACTION_DONE_TEXTS,
   SLACK_ACTION_ERROR_TEXTS,
   SLACK_ACTION_GENERATE_REQUESTS,
+  SLACK_ACTION_IN_PROGRESS_TEXTS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "../constants/slack-actions.js";
 import { mapObjectToArray } from "./array.js";
@@ -47,54 +48,87 @@ export const convertContentObjectToSlackMessage = (content) => {
   };
 };
 
+export const convertUserInputToSlackMessage = (text) => {
+  return {
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `_User: \`${text}\`_`,
+        },
+      },
+    ],
+  };
+};
+
+export const mergeSlackMessages = (...messages) => {
+  return messages.reduce(
+    (finalMessage, message) => ({
+      ...finalMessage,
+      ...message,
+      blocks: [
+        ...(finalMessage.blocks || []),
+        { type: "divider" },
+        ...(message.blocks || []),
+      ],
+    }),
+    {}
+  );
+};
+
 export const generateSubmitRequestsSection = (content) => {
   const hasAnyRequest = countRequestsInContentObject(content) > 0;
   const hasMultipleRequests = countRequestsInContentObject(content) > 1;
-  return hasAnyRequest ? [
-    {
-      type: "divider",
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `_Need changes in requests? Edit in field(s) or tell me to do it for you._`,
-      },
-      accessory: {
-        type: "button",
-        text: {
-          type: "plain_text",
-          text: `Confirm and run ${hasMultipleRequests ? "actions" : "action"}`,
-          emoji: true,
+  return hasAnyRequest
+    ? [
+        {
+          type: "divider",
         },
-        value: "submit_requests",
-        action_id: SLACK_ACTION_SUBMIT_REQUESTS,
-        style: "primary",
-      },
-    },
-  ] : [
-    {
-      type: "divider",
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `_Should I generate a request or do you want to share more details?_`,
-      },
-      accessory: {
-        type: "button",
-        text: {
-          type: "plain_text",
-          text: `Generate request`,
-          emoji: true,
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `_Need changes in requests? Edit in field(s) or tell me to do it for you._`,
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: `Confirm and run ${
+                hasMultipleRequests ? "actions" : "action"
+              }`,
+              emoji: true,
+            },
+            value: "submit_requests",
+            action_id: SLACK_ACTION_SUBMIT_REQUESTS,
+            style: "primary",
+          },
         },
-        value: "generate_requests",
-        action_id: SLACK_ACTION_GENERATE_REQUESTS,
-        style: "primary",
-      },
-    }
-  ];
+      ]
+    : [
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `_Should I generate a request or do you want to share more details?_`,
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: `Generate request`,
+              emoji: true,
+            },
+            value: "generate_requests",
+            action_id: SLACK_ACTION_GENERATE_REQUESTS,
+            style: "primary",
+          },
+        },
+      ];
 };
 
 export const countRequestsInContentObject = (content) => {
@@ -125,10 +159,12 @@ export const sendSuccessResponseMessage = (payload, responses) => {
     SLACK_ACTION_DONE_TEXTS[
       Math.floor(Math.random() * SLACK_ACTION_DONE_TEXTS.length)
     ];
-  const content = `Here are responses:\n\`\`\`${prettyPrintJSON(responses)}\n\`\`\``;
+  const content = `Here are responses:\n\`\`\`${prettyPrintJSON(
+    responses
+  )}\n\`\`\``;
   const text = `${header}\n\n${content}`;
   return sendResponseMessage(payload, { text });
-}
+};
 
 export const sendErrorResponseMessage = (payload, error) => {
   const header =
@@ -137,4 +173,20 @@ export const sendErrorResponseMessage = (payload, error) => {
     ];
   const text = `${header}\n\n${error}`;
   return sendResponseMessage(payload, { text }, false);
-}
+};
+
+export const sendInProgressResponseMessage = (payload) => {
+  const text =
+    SLACK_ACTION_IN_PROGRESS_TEXTS[
+      Math.floor(Math.random() * SLACK_ACTION_IN_PROGRESS_TEXTS.length)
+    ];
+  return sendResponseMessage(payload, { text });
+};
+
+export const getInProgressMessage = () => {
+  const text =
+    SLACK_ACTION_IN_PROGRESS_TEXTS[
+      Math.floor(Math.random() * SLACK_ACTION_IN_PROGRESS_TEXTS.length)
+    ];
+  return { text };
+};

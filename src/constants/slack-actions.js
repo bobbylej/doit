@@ -27,3 +27,16 @@ export const SLACK_ACTION_ERROR_TEXTS = [
   "🙀 Catastrophic failure detected! 🙀",
   "😱 Oh no, the system is down! 😱"
 ];
+
+export const SLACK_ACTION_IN_PROGRESS_TEXTS = [
+  "⌛️ Hang tight, we're working on it... ⌛️",
+  "🔧 Just a moment, we're tinkering away... 🔧",
+  "⚙️ Processing... Please wait... ⚙️",
+  "🕒 Patience, we're making progress... 🕒",
+  "🔄 Working hard to get it done... 🔄",
+  "🔨 Building... Almost there... 🔨",
+  "⏳ It's a work in progress... ⏳",
+  "🔆 Keep calm, the process is underway... 🔆",
+  "⚡️ Working our magic, hold on... ⚡️",
+  "📊 Crunching the numbers... Hang on tight... 📊"
+];

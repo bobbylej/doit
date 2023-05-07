@@ -56,3 +56,5 @@ Replace \`{issueIdOrKey}\` with the ID or key of the issue you want to update, a
 
 Note that you will need to authenticate your requests with a JIRA user account that has the necessary permissions to update issues in the DOIT project.
 `;
+
+export const messageToCreateAttribute = "Here is the request to create a custom field of type \"Select List (single choice)\" with options \"Red\", \"Yellow\" and \"Green\" in the DOIT project:\n\n```request\n[{\n  url: '/rest/api/3/field',\n  method: 'POST',\n  body: {\n    \"name\": \"Color\",\n    \"description\": \"Color attribute\",\n    \"type\": \"com.atlassian.jira.plugin.system.customfieldtypes:select\",\n    \"searcherKey\": \"com.atlassian.jira.plugin.system.customfieldtypes:selectsearcher\",\n    \"options\": [\n      {\n        \"value\": \"Red\"\n      },\n      {\n        \"value\": \"Yellow\"\n      },\n      {\n        \"value\": \"Green\"\n      }\n    ]\n  }\n}]```\n\nPlease note that you need to have the necessary permissions to create custom fields in the DOIT project.";
