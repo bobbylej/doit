@@ -3,9 +3,11 @@ import { CONTENT_TYPE_REQUEST } from "../constants/jira-openai-prompts.js";
 import {
   SLACK_ACTION_DONE_TEXTS,
   SLACK_ACTION_ERROR_TEXTS,
+  SLACK_ACTION_GENERATE_REQUESTS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "../constants/slack-actions.js";
 import { mapObjectToArray } from "./array.js";
+import { prettyPrintJSON } from "./object.js";
 
 export const objectToInteractiveBlock = (object, index) => {
   const arrayWithAttributes = mapObjectToArray(object);
@@ -46,8 +48,9 @@ export const convertContentObjectToSlackMessage = (content) => {
 };
 
 export const generateSubmitRequestsSection = (content) => {
+  const hasAnyRequest = countRequestsInContentObject(content) > 0;
   const hasMultipleRequests = countRequestsInContentObject(content) > 1;
-  return [
+  return hasAnyRequest ? [
     {
       type: "divider",
     },
@@ -69,6 +72,28 @@ export const generateSubmitRequestsSection = (content) => {
         style: "primary",
       },
     },
+  ] : [
+    {
+      type: "divider",
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `_Should I generate a request or do you want to share more details?_`,
+      },
+      accessory: {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: `Generate request`,
+          emoji: true,
+        },
+        value: "generate_requests",
+        action_id: SLACK_ACTION_GENERATE_REQUESTS,
+        style: "primary",
+      },
+    }
   ];
 };
 
@@ -80,8 +105,9 @@ export const countRequestsInContentObject = (content) => {
   );
 };
 
-export const sendResponseMessage = (payload, text, replaceOriginal = true) => {
+export const sendResponseMessage = (payload, body, replaceOriginal = true) => {
   const responseUrl = payload.response_url;
+  console.log("responseUrl", responseUrl);
   return fetch(responseUrl, {
     method: "POST",
     headers: {
@@ -89,7 +115,7 @@ export const sendResponseMessage = (payload, text, replaceOriginal = true) => {
     },
     body: JSON.stringify({
       replace_original: replaceOriginal,
-      text,
+      ...body,
     }),
   });
 };
@@ -99,9 +125,9 @@ export const sendSuccessResponseMessage = (payload, responses) => {
     SLACK_ACTION_DONE_TEXTS[
       Math.floor(Math.random() * SLACK_ACTION_DONE_TEXTS.length)
     ];
-  const content = `Here are responses:\n\`\`\`${JSON.stringify(responses)}\n\`\`\``;
+  const content = `Here are responses:\n\`\`\`${prettyPrintJSON(responses)}\n\`\`\``;
   const text = `${header}\n\n${content}`;
-  return sendResponseMessage(payload, text);
+  return sendResponseMessage(payload, { text });
 }
 
 export const sendErrorResponseMessage = (payload, error) => {
@@ -110,5 +136,5 @@ export const sendErrorResponseMessage = (payload, error) => {
       Math.floor(Math.random() * SLACK_ACTION_ERROR_TEXTS.length)
     ];
   const text = `${header}\n\n${error}`;
-  return sendResponseMessage(payload, text, false);
+  return sendResponseMessage(payload, { text }, false);
 }

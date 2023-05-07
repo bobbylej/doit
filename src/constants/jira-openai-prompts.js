@@ -17,3 +17,5 @@ export const JIRA_OPENAI_SYSTEM_PROMPT = "You are a converter from natural langu
 
 export const CONTENT_TYPE_NOTE = "note";
 export const CONTENT_TYPE_REQUEST = "request";
+
+export const JIRA_OPENAI_GENERATE_REQUESTS_PROMPT = "Generate a request or requests for that.";

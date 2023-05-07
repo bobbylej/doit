@@ -9,7 +9,7 @@ import {
 import { createChatCompletion, createCompletion } from "./openai.js";
 import { convertBodyForRequest } from "./api.js";
 import { mergeArraysAlternately } from "./array.js";
-import { setValueByPath } from "./object.js";
+import { parseJSON, prettyPrintJSON, setValueByPath } from "./object.js";
 
 const configuration = {
   username: process.env.JIRA_USERNAME,
@@ -113,7 +113,7 @@ export const convertTextMessageWithRequests = (message) => {
 
 const getRequestsFromText = (message) => {
   const requests = [...message.matchAll(JIRA_OPENAI_REQUEST_REGEX)]
-    .map((match) => JSON.parse(match[1]))
+    .map((match) => parseJSON(match[1]))
     .flat(1);
   return requests;
 };
@@ -132,7 +132,7 @@ export const convertSlackStateObjectToRequests = (state) => {
 };
 
 export const convertJiraErrorToSlackMessage = (error) => {
-  return `For request:\n\`\`\`${JSON.stringify(
+  return `For request:\n\`\`\`${prettyPrintJSON(
     error.request
-  )}\`\`\`\n\nWe got such error:\n\`\`\`${JSON.stringify(error.error)}\`\`\``;
+  )}\`\`\`\n\nWe got such error:\n\`\`\`${prettyPrintJSON(error.error)}\`\`\``;
 };

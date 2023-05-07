@@ -1,5 +1,7 @@
 export const SLACK_ACTION_SUBMIT_REQUESTS = "submit-requests";
 
+export const SLACK_ACTION_GENERATE_REQUESTS = "generate-requests";
+
 export const SLACK_ACTION_DONE_TEXTS = [
   "🎉 Ta-da! All done! 🎉",
   "✅ Mission accomplished! ✅",
