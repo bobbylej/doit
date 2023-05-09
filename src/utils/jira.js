@@ -10,6 +10,7 @@ import { createChatCompletion, createCompletion } from "./openai.js";
 import { convertBodyForRequest } from "./api.js";
 import { mergeArraysAlternately } from "./array.js";
 import { parseJSON, prettyPrintJSON, setValueByPath } from "./object.js";
+import { PROMISE_STATUS } from "../constants/promise.js";
 
 const configuration = {
   username: process.env.JIRA_USERNAME,
@@ -30,39 +31,46 @@ const headers = {
 
 const messages = [...JIRA_OPENAI_SYSTEM_MESSAGES];
 
-export const jira = (url, request, query) => {
+export const jira = async (url, request, query) => {
   const finalUrl = query ? `${url}?${new URLSearchParams(query)}` : url;
   const { body, ...options } = request;
-  return fetch(`https://${configuration.host}${finalUrl}`, {
+  const response = await fetch(`https://${configuration.host}${finalUrl}`, {
     headers,
     ...options,
     body: convertBodyForRequest(body),
-  });
+  }).then(response => response.json())
+  if (response.errors || response.errorMessages) {
+    return Promise.reject({
+      request,
+      error: [
+        ...(Object.entries(response.errors) || []),
+        ...(response.errorMessages || []),
+      ],
+    });
+  }
+  return {
+    request,
+    response,
+  };
 };
 
-export const bulkJira = (requests) => {
-  return Promise.all(
-    requests.map(({ url, method, body, query }) =>
-      jira(url, { method, body }, query)
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.errors || response.errorMessages)
-            return Promise.reject({
-              request: {
-                url,
-                method,
-                body,
-                query,
-              },
-              error: [
-                ...(response.errors || []),
-                ...(response.errorMessages || [])
-              ],
-            });
-          return response;
-        })
+export const bulkJira = async (requests) => {
+  const responses = await Promise.allSettled(
+    requests.map((request) =>
+      jira(
+        request.url,
+        { method: request.method, body: request.body },
+        request.query
+      )
     )
   );
+  const areAllFulfilled = responses.reduce(
+    (areAllFulfilled, response) =>
+      areAllFulfilled && response.status === PROMISE_STATUS.FULFILLED,
+    true
+  );
+  if (!areAllFulfilled) return Promise.reject(responses);
+  return responses;
 };
 
 export const pushJiraResponsesMessage = (responses) => {
@@ -132,11 +140,5 @@ export const convertSlackStateObjectToRequests = (state) => {
         }, request),
       {}
     )
-  );
-};
-
-export const convertJiraErrorToSlackMessage = (error) => {
-  return `For request:\n\`\`\`${prettyPrintJSON(
-    error.request
-  )}\`\`\`\n\nWe got such error:\n\`\`\`${prettyPrintJSON(error.error)}\`\`\``;
+  ).map((value) => parseJSON(value));
 };

@@ -9,7 +9,6 @@ import {
   generateRequestsForUserInput,
   submitRequests,
 } from "./utils/action.js";
-import { sendInProgressResponseMessage } from "./utils/slack.js";
 
 const app = express();
 
@@ -17,7 +16,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/", async (req, res) => {
   try {
-    sendInProgressResponseMessage(req.body);
     generateRequestsForUserInput(req.body);
     res.send();
   } catch (error) {
