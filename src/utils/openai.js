@@ -14,7 +14,7 @@ export const openAI = new OpenAIApi(configuration);
 export const createChatCompletion = (messages) => {
   return openAI.createChatCompletion({
     model: models.chatCompletionModel,
-    temperature: 0,
+    temperature: 0.2,
     messages,
   });
 };
@@ -23,7 +23,7 @@ export const createCompletion = (prompt) => {
   return openAI.createCompletion({
     model: models.completionModel,
     max_tokens: 400,
-    temperature: 0,
+    temperature: 0.2,
     prompt,
   });
 };
