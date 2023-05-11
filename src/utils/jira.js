@@ -117,19 +117,27 @@ export const convertTextMessageWithRequests = (message) => {
     .replace(JIRA_OPENAI_REQUEST_REGEX, requestMarker)
     .split(requestMarker)
     .map((note) => ({ type: CONTENT_TYPE_NOTE, content: note }));
-  const requests = getRequestsFromText(message).map((request) => ({
-    type: CONTENT_TYPE_REQUEST,
-    content: request,
-  }));
-  const content = mergeArraysAlternately(notes, requests);
+  const requests = getRequestsFromText(message).map((requests) => {
+    if (Array.isArray(requests)) {
+      return requests.map(request => ({
+        type: CONTENT_TYPE_REQUEST,
+        content: request,
+      }))
+    }
+    return {
+      type: CONTENT_TYPE_REQUEST,
+      content: requests,
+    };
+  });
+  const content = mergeArraysAlternately(notes, requests).flat();
   content[0].content = content[0].content.replace(startMarker, "");
   return content;
 };
 
 const getRequestsFromText = (message) => {
-  const requests = [...message.matchAll(JIRA_OPENAI_REQUEST_REGEX)]
-    .map((match) => parseJSON(match[1]))
-    .flat(1);
+  const requests = [...message.matchAll(JIRA_OPENAI_REQUEST_REGEX)].map(
+    (match) => parseJSON(match[1])
+  );
   return requests;
 };
 

@@ -1,5 +1,4 @@
 import { JIRA_OPENAI_GENERATE_REQUESTS_PROMPT } from "../constants/jira-openai-prompts.js";
-import { messageWithTwoRequests } from "../mocks/openai.mock.js";
 import {
   bulkJira,
   convertSlackStateObjectToRequests,
@@ -9,7 +8,6 @@ import {
   getRejectedPercentage,
   pushJiraResponsesMessage,
 } from "./jira.js";
-import { prettyPrintJSON } from "./object.js";
 import {
   convertContentObjectToSlackMessage,
   convertResponsesToSlackAttachments,
