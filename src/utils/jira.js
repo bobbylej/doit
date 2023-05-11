@@ -169,3 +169,10 @@ export const filterIncludedRequests = (requests) => {
     .filter((request) => !!request.include[0])
     .map((request) => ({ name: request.include[0], ...request.request }));
 };
+
+export const getRejectedPercentage = (promises) => {
+  return (
+    promises.filter((promise) => promise.status === PROMISE_STATUS.REJECTED)
+      .length / promises.length
+  );
+};

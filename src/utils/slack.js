@@ -8,6 +8,7 @@ import {
   SLACK_ACTION_GENERATE_REQUESTS,
   SLACK_ACTION_IN_PROGRESS_TEXTS,
   SLACK_ACTION_NOTHING_TO_DO_TEXTS,
+  SLACK_ACTION_PARTLY_ERROR_TEXTS,
   SLACK_ACTION_PICK_ACTIONS_TEXTS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "../constants/slack-actions.js";
@@ -201,6 +202,14 @@ export const sendErrorResponseMessage = (payload, attachments) => {
   const text =
     SLACK_ACTION_ERROR_TEXTS[
       Math.floor(Math.random() * SLACK_ACTION_ERROR_TEXTS.length)
+    ];
+  return sendResponseMessage(payload, { text, attachments }, false);
+};
+
+export const sendPartlyErrorResponseMessage = (payload, attachments) => {
+  const text =
+    SLACK_ACTION_PARTLY_ERROR_TEXTS[
+      Math.floor(Math.random() * SLACK_ACTION_PARTLY_ERROR_TEXTS.length)
     ];
   return sendResponseMessage(payload, { text, attachments }, false);
 };

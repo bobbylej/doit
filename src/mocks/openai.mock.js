@@ -3,6 +3,7 @@ export const messageWithTwoRequests = `
 
 \`\`\`request
 [{
+  "name": "Create Issue to generate server",
   "url": "/rest/api/3/issue",
   "method": "POST",
   "body": {
@@ -13,16 +14,31 @@ export const messageWithTwoRequests = `
       "issuetype": {
         "name": "Error"
       },
-      "summary": "generate server"
+      "summary": "Generate server"
+    }
+  }
+},{
+  "name": "Create Issue to add documentation for server",
+  "url": "/rest/api/3/issue",
+  "method": "POST",
+  "body": {
+    "fields": {
+      "project": {
+        "key": "DOIT"
+      },
+      "issuetype": {
+        "name": "Task"
+      },
+      "summary": "Create documentation for server"
     }
   }
 }]
 \`\`\` 
 
 Please note that I have assumed the issue type to be "Task" based on the provided information. If you need to change it to any other issue type, please let me know.
-
 \`\`\`request
-[{
+{
+  "name": "Create Issue to integrate with JIRA",
   "url": "/rest/api/3/issue",
   "method": "POST",
   "body": {
@@ -36,7 +52,7 @@ Please note that I have assumed the issue type to be "Task" based on the provide
       "summary": "Add integration with JIRA"
     }
   }
-}]
+}
 \`\`\` 
 `;
 

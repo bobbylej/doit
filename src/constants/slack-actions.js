@@ -28,6 +28,19 @@ export const SLACK_ACTION_ERROR_TEXTS = [
   "😱 Oh no, the system is down! 😱",
 ];
 
+export const SLACK_ACTION_PARTLY_ERROR_TEXTS = [
+  "⚠️ Some actions completed, but a few encountered errors along the way. ⚠️",
+  "🔍 Progress made, but errors stumbled upon a few actions. 🔍",
+  "🚧 Incomplete mission! Some actions finished, but a few got tangled in errors. 🚧",
+  "❗ Mixed results! Few actions completed, but errors disrupted the rest. ❗",
+  "⚡️ Partial success with a sprinkle of errors! Some actions triumphed, some stumbled. ⚡️",
+  "💥 Partial completion with a few unexpected errors. We'll regroup and try again. 💥",
+  "🌩️ Thunderstorm of errors hit a few actions, but others made it through. 🌩️",
+  "🛑 Hiccup alert! Some actions finished, but errors tripped up a few. 🛑",
+  "🔧 Some actions assembled successfully, but errors played spoilsport with the rest. 🔧",
+  "🚦 Mixed bag! Part of the actions cleared, but errors stopped the rest at a red light. 🚦",
+];
+
 export const SLACK_ACTION_IN_PROGRESS_TEXTS = [
   "⌛️ Hang tight, we're working on it... ⌛️",
   "🔧 Just a moment, we're tinkering away... 🔧",

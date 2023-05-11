@@ -6,6 +6,7 @@ import {
   convertTextMessageWithRequests,
   filterIncludedRequests,
   generateJiraChatRequests,
+  getRejectedPercentage,
   pushJiraResponsesMessage,
 } from "./jira.js";
 import { prettyPrintJSON } from "./object.js";
@@ -17,6 +18,7 @@ import {
   sendErrorResponseMessage,
   sendInProgressResponseMessage,
   sendNothingToDoResponseMessage,
+  sendPartlyErrorResponseMessage,
   sendResponseMessage,
   sendSuccessResponseMessage,
 } from "./slack.js";
@@ -35,8 +37,13 @@ export const submitRequests = async (payload) => {
     pushJiraResponsesMessage(responses);
   } catch (error) {
     console.error(error);
+    const rejectedPercentage = Array.isArray(error)
+      ? getRejectedPercentage(error)
+      : 1;
     const slackAttachments = convertResponsesToSlackAttachments(error);
-    sendErrorResponseMessage(payload, slackAttachments);
+    rejectedPercentage === 1
+      ? sendErrorResponseMessage(payload, slackAttachments)
+      : sendPartlyErrorResponseMessage(payload, slackAttachments);
     pushJiraResponsesMessage(error);
   }
 };
