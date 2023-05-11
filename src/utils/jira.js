@@ -31,38 +31,41 @@ const headers = {
 
 const messages = [...JIRA_OPENAI_SYSTEM_MESSAGES];
 
-export const jira = async (url, request, query) => {
-  const finalUrl = query ? `${url}?${new URLSearchParams(query)}` : url;
-  const { body, ...options } = request;
+export const jira = async (request) => {
+  const finalUrl = request.query
+    ? `${request.url}?${new URLSearchParams(request.query)}`
+    : request.url;
   const response = await fetch(`https://${configuration.host}${finalUrl}`, {
     headers,
-    ...options,
-    body: convertBodyForRequest(body),
-  }).then(response => response.json())
-  if (response.errors || response.errorMessages) {
+    method: request.method,
+    body: request.body && convertBodyForRequest(request.body),
+  });
+  try {
+    const responseBody = await response.json();
+    if (responseBody.errors || responseBody.errorMessages) {
+      return Promise.reject({
+        request,
+        error: [
+          ...(Object.entries(responseBody.errors) || []),
+          ...(responseBody.errorMessages || []),
+        ],
+      });
+    }
+    return {
+      request,
+      response: responseBody,
+    };
+  } catch (error) {
     return Promise.reject({
       request,
-      error: [
-        ...(Object.entries(response.errors) || []),
-        ...(response.errorMessages || []),
-      ],
+      error: [response.statusText],
     });
   }
-  return {
-    request,
-    response,
-  };
 };
 
 export const bulkJira = async (requests) => {
   const responses = await Promise.allSettled(
-    requests.map((request) =>
-      jira(
-        request.url,
-        { method: request.method, body: request.body },
-        request.query
-      )
-    )
+    requests.map((request) => jira(request))
   );
   const areAllFulfilled = responses.reduce(
     (areAllFulfilled, response) =>
@@ -134,11 +137,35 @@ export const convertSlackStateObjectToRequests = (state) => {
   return Object.values(
     Object.values(state).reduce(
       (request, item) =>
-        Object.entries(item).reduce((acc, [path, { value }]) => {
+        Object.entries(item).reduce((acc, [path, inputState]) => {
+          const value = getValueForInputFromState(inputState);
           setValueByPath(acc, path, value);
           return acc;
         }, request),
       {}
     )
-  ).map((value) => parseJSON(value));
+  ).map((value) => {
+    return {
+      ...value,
+      request:
+        typeof value.request === "string"
+          ? parseJSON(value.request)
+          : value.request,
+    };
+  });
+};
+
+const getValueForInputFromState = (state) => {
+  switch (state.type) {
+    case "plain_text_input":
+      return state.value;
+    case "checkboxes":
+      return state.selected_options.map((option) => option.value);
+  }
+};
+
+export const filterIncludedRequests = (requests) => {
+  return requests
+    .filter((request) => !!request.include[0])
+    .map((request) => ({ name: request.include[0], ...request.request }));
 };

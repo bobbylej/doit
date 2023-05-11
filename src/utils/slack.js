@@ -9,31 +9,54 @@ import {
   SLACK_ACTION_IN_PROGRESS_TEXTS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "../constants/slack-actions.js";
-import { mapObjectToArray } from "./array.js";
 import { prettyPrintJSON } from "./object.js";
 
-export const objectToInteractiveBlock = (object, index) => {
-  return {
-    type: "input",
-    element: {
-      type: "plain_text_input",
-      multiline: true,
-      action_id: `[${index}]`,
-      initial_value: prettyPrintJSON(object),
+export const requestToInteractiveBlock = (request, index) => {
+  const { name, ...requestDetails } = request;
+  const includeActionCheckboxOptions = [
+    {
+      text: {
+        type: "mrkdwn",
+        text: `*${name || "Request"}*`,
+      },
+      value: name || "Requests",
+    }
+  ];
+  return [
+    {
+      type: "divider",
     },
-    label: {
-      type: "plain_text",
-      text: "Requests",
-      emoji: true,
+    {
+      type: "actions",
+      elements: [{
+        type: "checkboxes",
+        action_id: `[${index}].include`,
+        options: includeActionCheckboxOptions,
+        initial_options: includeActionCheckboxOptions
+      }],
     },
-  };
+    {
+      type: "input",
+      element: {
+        type: "plain_text_input",
+        multiline: true,
+        action_id: `[${index}].request`,
+        initial_value: prettyPrintJSON(requestDetails),
+      },
+      label: {
+        type: "plain_text",
+        text: " ",
+        emoji: true,
+      },
+    },
+  ];
 };
 
 export const convertContentObjectToSlackMessage = (content) => {
   let requestsIndex = 0;
   const blocks = content.flatMap((item) => {
     if (item.type === CONTENT_TYPE_REQUEST) {
-      return objectToInteractiveBlock(item.content, requestsIndex++);
+      return requestToInteractiveBlock(item.content, requestsIndex++);
     }
     return [
       {
@@ -181,6 +204,7 @@ export const sendInProgressResponseMessage = (payload) => {
 };
 
 export const convertRequestErrorToSlackAttachment = (error) => {
+  const { name, ...request } = error.request;
   return [
     {
       color: COLORS.RED,
@@ -189,14 +213,14 @@ export const convertRequestErrorToSlackAttachment = (error) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Request failed*`,
+            text: `*${name || "Request"} failed*`,
           },
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `\`\`\`${prettyPrintJSON(error.request)}\`\`\``,
+            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
           },
         },
         {
@@ -212,6 +236,7 @@ export const convertRequestErrorToSlackAttachment = (error) => {
 };
 
 export const convertRequestSuccessToSlackAttachment = (response) => {
+  const { name, ...request } = response.request;
   return [
     {
       color: COLORS.GREEN,
@@ -220,14 +245,14 @@ export const convertRequestSuccessToSlackAttachment = (response) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Request succeed*`,
+            text: `*${name || "Request"} succeed*`,
           },
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `\`\`\`${prettyPrintJSON(response.request)}\`\`\``,
+            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
           },
         },
         {
