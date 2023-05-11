@@ -245,7 +245,7 @@ export const convertRequestErrorToSlackAttachment = (error) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*${name || "Request"} failed*`,
+            text: `FAILED - *${name || "Request"}*`,
           },
         },
         {
@@ -277,7 +277,7 @@ export const convertRequestSuccessToSlackAttachment = (response) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*${name || "Request"} succeed*`,
+            text: `SUCCEED - *${name || "Request"}*`,
           },
         },
         {
