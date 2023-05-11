@@ -12,7 +12,7 @@ export const SLACK_ACTION_DONE_TEXTS = [
   "🥳 Time to celebrate, we're done! 🥳",
   "🎉 Another one bites the dust! 🎉",
   "🎊 We did it! Party time! 🎊",
-  "🎈 That's it, we're finished! 🎈"
+  "🎈 That's it, we're finished! 🎈",
 ];
 
 export const SLACK_ACTION_ERROR_TEXTS = [
@@ -25,7 +25,7 @@ export const SLACK_ACTION_ERROR_TEXTS = [
   "🆘 Help! Error message alert! 🆘",
   "🤯 This wasn't supposed to happen! 🤯",
   "🙀 Catastrophic failure detected! 🙀",
-  "😱 Oh no, the system is down! 😱"
+  "😱 Oh no, the system is down! 😱",
 ];
 
 export const SLACK_ACTION_IN_PROGRESS_TEXTS = [
@@ -38,5 +38,31 @@ export const SLACK_ACTION_IN_PROGRESS_TEXTS = [
   "⏳ It's a work in progress... ⏳",
   "🔆 Keep calm, the process is underway... 🔆",
   "⚡️ Working our magic, hold on... ⚡️",
-  "📊 Crunching the numbers... Hang on tight... 📊"
+  "📊 Crunching the numbers... Hang on tight... 📊",
+];
+
+export const SLACK_ACTION_NOTHING_TO_DO_TEXTS = [
+  "🤷‍♂️ Nothing to see here, folks! 🤷‍♂️",
+  "🙅‍♀️ Sorry, there's nothing to do at the moment. 🙅‍♀️",
+  "🌞 Enjoy the free time, no tasks on the horizon! 🌞",
+  "😴 Sit back, relax, and enjoy the emptiness. 😴",
+  "🌴 Time to kick back and do nothing! 🌴",
+  "⛱️ Ahh... the blissful emptiness! ⛱️",
+  "🐌 Taking it slow, no tasks to tackle. 🐌",
+  "🔇 Shhh... Silence, because there's nothing to do. 🔇",
+  "💤 Enjoy the tranquility of no tasks. 💤",
+  "🧘‍♂️ Embrace the Zen of nothingness. 🧘‍♂️",
+];
+
+export const SLACK_ACTION_PICK_ACTIONS_TEXTS = [
+  "🤔 Time to pick and choose some actions to run! 🤔",
+  "🔍 Seeking actions to run... Take your pick! 🔍",
+  "🎯 Ready, set, pick your actions to run! 🎯",
+  "⚡️ It's action time! Choose and run your tasks! ⚡️",
+  "🔢 Select actions and let the running begin! 🔢",
+  "💪 Get ready to flex your action-picking muscles! 💪",
+  "🌟 Time to shine! Handpick actions to run like a star! 🌟",
+  "🔥 Ignite your productivity by selecting actions to run! 🔥",
+  "🎮 Level up! Choose your actions and start running! 🎮",
+  "🔧 Ready to roll? Pick your actions and run with it! 🔧",
 ];

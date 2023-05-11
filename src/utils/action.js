@@ -16,6 +16,7 @@ import {
   mergeSlackMessages,
   sendErrorResponseMessage,
   sendInProgressResponseMessage,
+  sendNothingToDoResponseMessage,
   sendResponseMessage,
   sendSuccessResponseMessage,
 } from "./slack.js";
@@ -25,6 +26,9 @@ export const submitRequests = async (payload) => {
     const requests = filterIncludedRequests(
       convertSlackStateObjectToRequests(payload.state.values)
     );
+    if (!requests.length) {
+      return sendNothingToDoResponseMessage(payload);
+    }
     const responses = requests && (await bulkJira(requests));
     const slackAttachments = convertResponsesToSlackAttachments(responses);
     await sendSuccessResponseMessage(payload, slackAttachments);

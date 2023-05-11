@@ -7,6 +7,8 @@ import {
   SLACK_ACTION_ERROR_TEXTS,
   SLACK_ACTION_GENERATE_REQUESTS,
   SLACK_ACTION_IN_PROGRESS_TEXTS,
+  SLACK_ACTION_NOTHING_TO_DO_TEXTS,
+  SLACK_ACTION_PICK_ACTIONS_TEXTS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "../constants/slack-actions.js";
 import { prettyPrintJSON } from "./object.js";
@@ -20,7 +22,7 @@ export const requestToInteractiveBlock = (request, index) => {
         text: `*${name || "Request"}*`,
       },
       value: name || "Requests",
-    }
+    },
   ];
   return [
     {
@@ -28,12 +30,14 @@ export const requestToInteractiveBlock = (request, index) => {
     },
     {
       type: "actions",
-      elements: [{
-        type: "checkboxes",
-        action_id: `[${index}].include`,
-        options: includeActionCheckboxOptions,
-        initial_options: includeActionCheckboxOptions
-      }],
+      elements: [
+        {
+          type: "checkboxes",
+          action_id: `[${index}].include`,
+          options: includeActionCheckboxOptions,
+          initial_options: includeActionCheckboxOptions,
+        },
+      ],
     },
     {
       type: "input",
@@ -160,6 +164,10 @@ export const mergeSlackMessages = (...messages) => {
         { type: "divider" },
         ...(message.blocks || []),
       ],
+      attachments: [
+        ...(finalMessage.attachments || []),
+        ...(message.attachments || []),
+      ],
     }),
     {}
   );
@@ -176,7 +184,9 @@ export const sendResponseMessage = (payload, body, replaceOriginal = true) => {
       replace_original: replaceOriginal,
       ...body,
     }),
-  });
+  }).then(async (response) =>
+    response.ok ? response.text() : Promise.reject(await response.text())
+  );
 };
 
 export const sendSuccessResponseMessage = (payload, attachments) => {
@@ -201,6 +211,19 @@ export const sendInProgressResponseMessage = (payload) => {
       Math.floor(Math.random() * SLACK_ACTION_IN_PROGRESS_TEXTS.length)
     ];
   return sendResponseMessage(payload, { text });
+};
+
+export const sendNothingToDoResponseMessage = (payload) => {
+  const nothingToDoText =
+    SLACK_ACTION_NOTHING_TO_DO_TEXTS[
+      Math.floor(Math.random() * SLACK_ACTION_NOTHING_TO_DO_TEXTS.length)
+    ];
+  const pickActionsText =
+    SLACK_ACTION_PICK_ACTIONS_TEXTS[
+      Math.floor(Math.random() * SLACK_ACTION_PICK_ACTIONS_TEXTS.length)
+    ];
+  const text = `${nothingToDoText}\n${pickActionsText}`;
+  return sendResponseMessage(payload, { text }, false);
 };
 
 export const convertRequestErrorToSlackAttachment = (error) => {
