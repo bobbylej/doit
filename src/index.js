@@ -2,21 +2,35 @@ import express from "express";
 import bodyParser from "body-parser";
 import {
   SLACK_ACTION_GENERATE_REQUESTS,
+  SLACK_ACTION_PROVIDE_API_KEYS,
   SLACK_ACTION_SUBMIT_REQUESTS,
 } from "./constants/slack-actions.js";
 import {
+  askForAPIKeys,
+  chat,
+  clearSessionMessages,
   generateRequestsForPreviousMessage,
   generateRequestsForUserInput,
+  storeApiKeys,
   submitRequests,
 } from "./utils/action.js";
+import {
+  clearMessagesInSession,
+  destroySession,
+  pushMessageToSession,
+  setSessionAPIKeys,
+} from "./utils/session.js";
+import { connectDB } from "./utils/mongoose.js";
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+await connectDB();
+
 app.post("/", async (req, res) => {
   try {
-    generateRequestsForUserInput(req.body);
+    chat(req.body);
     res.send();
   } catch (error) {
     console.error(error);
@@ -35,6 +49,8 @@ app.post("/interact", async (req, res) => {
         case SLACK_ACTION_GENERATE_REQUESTS:
           generateRequestsForPreviousMessage(payload);
           break;
+        case SLACK_ACTION_PROVIDE_API_KEYS:
+          storeApiKeys(payload);
       }
     });
     res.send();
@@ -42,6 +58,16 @@ app.post("/interact", async (req, res) => {
     console.error(error);
     res.status(500);
   }
+});
+
+app.post("/api-keys", (req, res) => {
+  askForAPIKeys(req.body);
+  res.send();
+});
+
+app.post("/clear", (req, res) => {
+  clearSessionMessages(req.body);
+  res.send();
 });
 
 app.listen(3000, () => {

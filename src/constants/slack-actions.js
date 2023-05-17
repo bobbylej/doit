@@ -1,5 +1,5 @@
+export const SLACK_ACTION_PROVIDE_API_KEYS = "provide-api-keys";
 export const SLACK_ACTION_SUBMIT_REQUESTS = "submit-requests";
-
 export const SLACK_ACTION_GENERATE_REQUESTS = "generate-requests";
 
 export const SLACK_ACTION_DONE_TEXTS = [
@@ -78,4 +78,30 @@ export const SLACK_ACTION_PICK_ACTIONS_TEXTS = [
   "🔥 Ignite your productivity by selecting actions to run! 🔥",
   "🎮 Level up! Choose your actions and start running! 🎮",
   "🔧 Ready to roll? Pick your actions and run with it! 🔧",
+];
+
+export const SLACK_ACTION_API_KEYS_REQUIRED_TEXTS = [
+  "🔑 Attention! API keys required for OpenAI and JIRA. Please provide them. 🔑",
+  "🔒 Unlock the power! We need API keys for OpenAI and JIRA. Can you provide them? 🔒",
+  "🔐 Access denied! We need API keys for OpenAI and JIRA. Kindly provide them. 🔐",
+  "⚙️ Missing API keys! Help us connect to OpenAI and JIRA by providing the required keys. ⚙️",
+  "🔑 Time to authenticate! Please provide the necessary API keys for OpenAI and JIRA. 🔑",
+  "🔐 Secure the connection! We're in need of API keys for OpenAI and JIRA. 🔐",
+  "🔑 Key me in! API keys are needed for OpenAI and JIRA. Can you share them with us? 🔑",
+  "⚡️ Power up! We require API keys for OpenAI and JIRA. Please provide them to continue. ⚡️",
+  "🔒 Protect the access! API keys for OpenAI and JIRA are missing. Can you supply them? 🔒",
+  "🔑 API keys alert! OpenAI and JIRA require your attention. Please provide the necessary keys. 🔑",
+];
+
+export const SLACK_ACTION_WHAT_TO_DO_TEXTS = [
+  "🤔 How may I be of service to you? Let me know! 🤔",
+  "🎯 Your wish is my command! What can I do for you today? 🎯",
+  "🌟 Ready and at your service! How can I assist you? 🌟",
+  "🔮 Just say the word! What can I do to help you today? 🔮",
+  "💬 Speak up! I'm here to listen and fulfill your requests. 💬",
+  "🤝 Let's collaborate! How can I support you? 🤝",
+  "🙌 Ready to help! Tell me what you need, and I'll do my best! 🙌",
+  "💡 How can I illuminate your path today? Let me know! 💡",
+  "🔧 How can I be of assistance? Feel free to share your requests! 🔧",
+  "⚡️ I'm all ears! What task or information are you looking for? ⚡️",
 ];

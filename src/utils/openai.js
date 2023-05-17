@@ -1,17 +1,17 @@
 import { Configuration, OpenAIApi } from "openai";
+import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
 
-const configuration = new Configuration({
-  organization: process.env.OPENAI_API_ORGANIZATION,
-  apiKey: process.env.OPENAI_API_KEY,
-});
 const models = {
   chatCompletionModel: process.env.OPENAI_API_CHAT_COMPLETION_MODEL,
   completionModel: process.env.OPENAI_API_COMPLETION_MODEL,
 }
 
-export const openAI = new OpenAIApi(configuration);
-
-export const createChatCompletion = (messages) => {
+export const createChatCompletion = (messages, apiKeys) => {
+  const configuration = new Configuration({
+    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
+    apiKey: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY],
+  });
+  const openAI = new OpenAIApi(configuration);
   return openAI.createChatCompletion({
     model: models.chatCompletionModel,
     temperature: 0.2,
@@ -19,7 +19,12 @@ export const createChatCompletion = (messages) => {
   });
 };
 
-export const createCompletion = (prompt) => {
+export const createCompletion = (prompt, apiKeys) => {
+  const configuration = new Configuration({
+    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
+    apiKey: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY],
+  });
+  const openAI = new OpenAIApi(configuration);
   return openAI.createCompletion({
     model: models.completionModel,
     max_tokens: 400,
