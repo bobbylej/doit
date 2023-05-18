@@ -4,22 +4,15 @@ import {
   SLACK_ACTION_GENERATE_REQUESTS,
   SLACK_ACTION_PROVIDE_API_KEYS,
   SLACK_ACTION_SUBMIT_REQUESTS,
-} from "./constants/slack-actions.js";
+} from "./constants/slack.js";
 import {
   askForAPIKeys,
   chat,
   clearSessionMessages,
   generateRequestsForPreviousMessage,
-  generateRequestsForUserInput,
   storeApiKeys,
   submitRequests,
 } from "./utils/action.js";
-import {
-  clearMessagesInSession,
-  destroySession,
-  pushMessageToSession,
-  setSessionAPIKeys,
-} from "./utils/session.js";
 import { connectDB } from "./utils/mongoose.js";
 
 const app = express();

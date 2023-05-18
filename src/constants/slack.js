@@ -1,3 +1,5 @@
+export const SLACK_TEXT_MAX_LENGTH = 3000;
+
 export const SLACK_ACTION_PROVIDE_API_KEYS = "provide-api-keys";
 export const SLACK_ACTION_SUBMIT_REQUESTS = "submit-requests";
 export const SLACK_ACTION_GENERATE_REQUESTS = "generate-requests";

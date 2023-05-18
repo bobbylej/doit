@@ -27,3 +27,11 @@ export const mapObjectToArray = (obj, parentKey = '') => {
     return acc;
   }, []);
 }
+
+export const splitTextByMaxLength = (text, maxLength) => {
+  const splittedText = [];
+  for (let i = 0; i < text.length; i += maxLength) {
+    splittedText.push(text.slice(i, i + maxLength));
+  }
+  return splittedText;
+}

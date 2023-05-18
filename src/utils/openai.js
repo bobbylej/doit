@@ -27,7 +27,7 @@ export const createCompletion = (prompt, apiKeys) => {
   const openAI = new OpenAIApi(configuration);
   return openAI.createCompletion({
     model: models.completionModel,
-    max_tokens: 400,
+    max_tokens: 1000,
     temperature: 0.2,
     prompt,
   });

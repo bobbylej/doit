@@ -85,7 +85,7 @@ export const generateJiraChatRequests = async (messages, session) => {
 };
 
 export const generateJiraRequests = async (actions, session) => {
-  const prompt = `${JIRA_OPENAI_SYSTEM_PROMPT} ${actions}`;
+  const prompt = `${JIRA_OPENAI_SYSTEM_PROMPT} ${JSON.stringify(actions)}`;
   const completion = await createCompletion(prompt, session);
   return completion.data.choices[0].text;
 };
@@ -117,7 +117,14 @@ export const convertTextMessageWithRequests = (message) => {
 
 const getRequestsFromText = (message) => {
   const requests = [...message.matchAll(JIRA_OPENAI_REQUEST_REGEX)].map(
-    (match) => parseJSON(match[1])
+    (match) => {
+      try {
+        return parseJSON(match[1]);
+      } catch (error) {
+        console.error(match[1], error);
+        return null;
+      }
+    }
   );
   return requests;
 };

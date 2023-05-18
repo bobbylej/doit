@@ -112,17 +112,21 @@ export const generateRequestsForPreviousMessage = async (payload) => {
 
 export const submitRequests = async (payload, session) => {
   try {
-    const requests = filterIncludedRequests(
-      convertSlackStateObjectToRequests(payload.state.values)
-    );
+    const allRequests = convertSlackStateObjectToRequests(payload.state.values);
+    const requests = filterIncludedRequests(allRequests);
     if (!requests.length) {
       return sendNothingToDoResponseMessage(payload);
     }
+    const areAllRequestsIncluded = allRequests.length === requests.length;
     const responses = requests && (await bulkJira(requests, session));
     const slackAttachments = convertResponsesToSlackAttachments(responses);
-    await sendSuccessResponseMessage(payload, {
-      attachments: slackAttachments,
-    });
+    await sendSuccessResponseMessage(
+      payload,
+      {
+        attachments: slackAttachments,
+      },
+      areAllRequestsIncluded
+    );
     pushMessageWithResponsesToSession(session.userId, responses);
   } catch (error) {
     console.error(error);

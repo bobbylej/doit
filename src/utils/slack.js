@@ -14,7 +14,8 @@ import {
   SLACK_ACTION_PROVIDE_API_KEYS,
   SLACK_ACTION_SUBMIT_REQUESTS,
   SLACK_ACTION_WHAT_TO_DO_TEXTS,
-} from "../constants/slack-actions.js";
+  SLACK_TEXT_MAX_LENGTH,
+} from "../constants/slack.js";
 import { prettyPrintJSON } from "./object.js";
 import {
   JIRA_API_KEYS_LINK,
@@ -22,6 +23,7 @@ import {
   OPENAI_ORGANIZATION_ID_LINK,
 } from "../constants/links.js";
 import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
+import { splitTextByMaxLength } from "./array.js";
 
 export const requestToInteractiveBlock = (request, index) => {
   const { name, ...requestDetails } = request;
@@ -225,13 +227,18 @@ export const sendNotifyResponseMessage = (
 
 export const sendSuccessResponseMessage = (
   payload,
-  { blocks, attachments } = {}
+  { blocks, attachments } = {},
+  replaceOriginal = true
 ) => {
   const text =
     SLACK_ACTION_DONE_TEXTS[
       Math.floor(Math.random() * SLACK_ACTION_DONE_TEXTS.length)
     ];
-  return sendNotifyResponseMessage(payload, { text, blocks, attachments });
+  return sendNotifyResponseMessage(
+    payload,
+    { text, blocks, attachments },
+    replaceOriginal
+  );
 };
 
 export const sendErrorResponseMessage = (
@@ -319,6 +326,14 @@ export const convertRequestErrorToSlackAttachment = (error) => {
 
 export const convertRequestSuccessToSlackAttachment = (response) => {
   const { name, ...request } = response.request;
+  const wrapper = {
+    start: "```\n",
+    end: "\n```",
+  }
+  const responseTextSplitted = splitTextByMaxLength(
+    prettyPrintJSON(response.response),
+    SLACK_TEXT_MAX_LENGTH - wrapper.start.length - wrapper.end.length
+  );
   return [
     {
       color: COLORS.GREEN,
@@ -341,11 +356,16 @@ export const convertRequestSuccessToSlackAttachment = (response) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `Response:\n\`\`\`${prettyPrintJSON(
-              response.response
-            )}\`\`\``,
+            text: `Response:`,
           },
         },
+        ...responseTextSplitted.map((text) => ({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `${wrapper.start}${text}${wrapper.end}`,
+          },
+        })),
       ],
     },
   ];

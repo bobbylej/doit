@@ -1,10 +1,10 @@
 import {
+  JIRA_OPENAI_INIT_MESSAGES,
   JIRA_OPENAI_SYSTEM_MESSAGES,
   OPENAI_MESSAGE_ROLE,
 } from "../constants/jira-openai-prompts.js";
 import { SESSION_MAX_AGE } from "../constants/session.js";
 import { SESSION_MODEL_API_KEYS, Session } from "../models/session.model.js";
-import { prettyPrintJSON } from "./object.js";
 
 export const getSession = async (userId) => {
   return Session.findOne({ userId }).exec();
@@ -59,21 +59,27 @@ export const pushMessageToSession = async (userId, message, role) => {
       status: 404,
       message: "Session for user not found",
     });
-  const messages = session?.messages || JIRA_OPENAI_SYSTEM_MESSAGES;
+  const messages = session?.messages || [...JIRA_OPENAI_SYSTEM_MESSAGES, ...JIRA_OPENAI_INIT_MESSAGES];
   messages.push({ role, content: message });
   return setSession(userId, { messages });
 };
 
 export const pushMessageWithResponsesToSession = (userId, responses) => {
-  const message = `Here are responses for last requests: ${JSON.stringify(
-    responses
-  )}`;
+  const message = responses
+    .map((response) => {
+      return `For request: ${JSON.stringify(
+        response.value?.request || response.reason?.request
+      )}\nI got response: ${JSON.stringify(
+        response.value?.response || response.reason?.error
+      )}`;
+    })
+    .join("\n\n");
   return pushMessageToSession(userId, message, OPENAI_MESSAGE_ROLE.USER);
 };
 
 export const clearMessagesInSession = async (userId) => {
   const session = await getSession(userId);
   if (session) {
-    return setSession(userId, { messages: JIRA_OPENAI_SYSTEM_MESSAGES });
+    return setSession(userId, { messages: [...JIRA_OPENAI_SYSTEM_MESSAGES, ...JIRA_OPENAI_INIT_MESSAGES] });
   }
 };
