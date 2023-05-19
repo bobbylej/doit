@@ -19,6 +19,7 @@ export const JIRA_OPENAI_SYSTEM_MESSAGES = [
 ];
 
 export const JIRA_OPENAI_INIT_MESSAGES = [
+  ...JIRA_OPENAI_SYSTEM_MESSAGES,
   {
     role: "user",
     content: "Create task to store api keys in DB inside PROJECT_KEY project",

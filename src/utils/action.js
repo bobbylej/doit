@@ -110,7 +110,13 @@ export const generateRequestsForPreviousMessage = async (payload) => {
   }
 };
 
-export const submitRequests = async (payload, session) => {
+export const submitRequests = async (payload) => {
+  const userId = payload.user_id || payload.user.id;
+  const session = await getSession(userId);
+  if (!session) {
+    await askForAPIKeys(payload);
+    return;
+  }
   try {
     const allRequests = convertSlackStateObjectToRequests(payload.state.values);
     const requests = filterIncludedRequests(allRequests);

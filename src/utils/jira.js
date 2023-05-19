@@ -8,16 +8,9 @@ import {
 import { createChatCompletion, createCompletion } from "./openai.js";
 import { convertBodyForRequest } from "./api.js";
 import { mergeArraysAlternately } from "./array.js";
-import { parseJSON, prettyPrintJSON, setValueByPath } from "./object.js";
+import { parseJSON, setValueByPath } from "./object.js";
 import { PROMISE_STATUS } from "../constants/promise.js";
 import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
-
-const configuration = {
-  username: process.env.JIRA_USERNAME,
-  apiToken: process.env.JIRA_API_TOKEN,
-  host: process.env.JIRA_HOST,
-  apiVersion: process.env.JIRA_API_VERSION,
-};
 
 const getJiraHeaders = ({ username, apiToken }) => ({
   Authorization: `Basic ${Buffer.from(`${username}:${apiToken}`).toString(
@@ -30,7 +23,7 @@ const getJiraHeaders = ({ username, apiToken }) => ({
 export const jira = async (request, session) => {
   const headers = getJiraHeaders({
     username: session[SESSION_MODEL_API_KEYS.JIRA_USERNAME],
-    apiToken: session[SESSION_MODEL_API_KEYS.JIRA_API_TOKEN],
+    apiToken: session[SESSION_MODEL_API_KEYS.JIRA_API_KEY],
   });
   const host = session[SESSION_MODEL_API_KEYS.JIRA_HOST];
   const url = request.query
@@ -42,7 +35,7 @@ export const jira = async (request, session) => {
     body: request.body && convertBodyForRequest(request.body),
   });
   try {
-    const responseBody = await response.json();
+    const responseBody = response.status === 204 ? { ok: true } : await response.json();
     if (responseBody.errors || responseBody.errorMessages) {
       return Promise.reject({
         request,

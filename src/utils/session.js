@@ -59,7 +59,7 @@ export const pushMessageToSession = async (userId, message, role) => {
       status: 404,
       message: "Session for user not found",
     });
-  const messages = session?.messages || [...JIRA_OPENAI_SYSTEM_MESSAGES, ...JIRA_OPENAI_INIT_MESSAGES];
+  const messages = session?.messages.length ?session?.messages : JIRA_OPENAI_INIT_MESSAGES;
   messages.push({ role, content: message });
   return setSession(userId, { messages });
 };
@@ -80,6 +80,6 @@ export const pushMessageWithResponsesToSession = (userId, responses) => {
 export const clearMessagesInSession = async (userId) => {
   const session = await getSession(userId);
   if (session) {
-    return setSession(userId, { messages: [...JIRA_OPENAI_SYSTEM_MESSAGES, ...JIRA_OPENAI_INIT_MESSAGES] });
+    return setSession(userId, { messages: JIRA_OPENAI_INIT_MESSAGES });
   }
 };
