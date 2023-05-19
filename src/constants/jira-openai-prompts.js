@@ -27,7 +27,7 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      'Sure, I can help you with that. Here is the request to create a new task in JIRA:\n```request\n[{\nname: \'Create Task to store API Keys in DB\',\nurl: \'/rest/api/3/issue\',\nmethod: \'POST\',\nbody: {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Store API keys in DB",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to store API keys in a database"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nReplace `PROJECT_KEY` with the key of the project where you want to create the task. This request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database". ',
+      '```request\n[{\nname: \'Create Task to store API Keys in DB\',\nurl: \'/rest/api/3/issue\',\nmethod: \'POST\',\nbody: {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Store API keys in DB",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to store API keys in a database"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nThis request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database".',
   },
   {
     role: "user",
@@ -37,42 +37,13 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      "Here is the request to create a filter in the PROJECT_KEY project to get all tasks with \"TODO\" label:\n```request\n[{\nname: 'Create filter',\nurl: '/rest/api/3/filter',\nmethod: 'POST',\nbody: {\njql: 'project=PROJECT_KEY and labels=TODO',\nname: 'TODO tasks filter',\ndescription: 'Filter to get all tasks with TODO label',\nfavourite: false\n}\n}]\n```\nReplace `PROJECT_KEY` with the actual key of your project. This request will create a new filter with the name \"TODO tasks filter\" and description \"Filter to get all tasks with TODO label\". You can modify the name and description as per your requirements. END",
-  },
-  {
-    role: "user",
-    content: "Create label field in PROJECT_KEY project for all issues",
-  },
-  {
-    role: "assistant",
-    content:
-      'Here is the request to create a label field in a project for all issues:\n```request\n[{\n"name": "Create label field for all issues",\n"url": "/rest/api/3/field",\n"method": "POST",\n"body": {\n"name": "Labels",\n"description": "Labels for categorizing issues",\n"type": "com.atlassian.jira.plugin.system.customfieldtypes:labels",\n"searcherKey": "com.atlassian.jira.plugin.system.customfieldtypes:labelsearcher",\n}\n}]\n```\nPlease replace `PROJECT_KEY` with the actual key of your project. ',
-  },
-  {
-    role: "user",
-    content:
-      'Get all issues in epic called "Server" with in progress status inside PROJECT_KEY project',
-  },
-  {
-    role: "assistant",
-    content:
-      'Here is the request to get all issues in an epic called "Server" with in progress status inside a project:\n```request\n[{\n"name": "Get all issues in epic called \'Server\' with in progress status",\n"url": "/rest/api/3/search",\n"method": "POST",\n"body": {\n"jql": "project = PROJECT_KEY AND issuetype = Epic AND status = \'In Progress\' AND \'Epic Link\' = Server",\n"fields": [\n"summary",\n"status",\n"assignee"\n]\n}\n}]\n```\nReplace `PROJECT_KEY` with the actual key of your project. This request will return all issues in the epic called "Server" with the status "In Progress" and the fields "summary", "status", and "assignee". ',
+      "```request\n[{\nname: 'Create filter for tasks with TODO label',\nurl: '/rest/api/3/filter',\nmethod: 'POST',\nbody: {\njql: 'project=PROJECT_KEY and labels=TODO',\nname: 'TODO tasks filter',\ndescription: 'Filter to get all tasks with TODO label',\nfavourite: false\n}\n}]\n```\nYou can modify the name and description as per your requirements.",
   },
   { role: "user", content: "Create epic called Server in PROJECT_KEY project" },
   {
     role: "assistant",
     content:
-      'Sure, here is the request to create an epic called "Server" in a project:\n```request\n[{\n"name": "Create epic called \'Server\'",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Server",\n"issuetype": {\n"name": "Epic"\n}\n}\n}\n}]\n```\nReplace `PROJECT_KEY` with the actual key of your project. This request will create a new epic with the summary "Server" in the specified project. ',
-  },
-  {
-    role: "user",
-    content:
-      "Assign issues in Server epic to user@company.com inside PROJECT_KEY project",
-  },
-  {
-    role: "assistant",
-    content:
-      'Sure, here is the request to assign all issues in the "Server" epic to the user with email `user@company.com`:\n```request\n[{\n"name": "Assign issues in \'Server\' epic to user@company.com",\n"url": "/rest/api/3/search",\n"method": "POST",\n"body": {\n"jql": "project = PROJECT_KEY AND issuetype = Story AND \'Epic Link\' = Server",\n"fields": [\n"summary",\n"status",\n"assignee"\n]\n}\n},\n{\n"name": "Assign issues to user@company.com",\n"url": "/rest/api/3/issue/ISSUE_KEY/assignee",\n"method": "PUT",\n"body": {\n"accountId": "USER_ACCOUNT_ID"\n}\n}\n]\n```\nReplace `PROJECT_KEY` with the actual key of your project, `user@company.com` with the email of the user you want to assign the issues to, and `ISSUE_KEY` with the key of each issue returned by the first request. You will also need to replace `USER_ACCOUNT_ID` with the actual account ID of the user you want to assign the issues to.\nNote that you will need to run the second request once for each issue returned by the first request in order to assign all of the issues to the specified user. ',
+      '```request\n[{\n"name": "Create epic called \'Server\'",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Server",\n"issuetype": {\n"name": "Epic"\n}\n}\n}\n}]\n```\nThis request will create a new epic with the summary "Server" in the specified project. ',
   },
   {
     role: "user",
@@ -87,16 +58,6 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "user",
     content:
-      "Create tasks in PROJECT_KEY project to implement changes in footer: adjust colors and paddings to designs, add common links, add newsletter form.",
-  },
-  {
-    role: "assistant",
-    content:
-      'Here is the request to create a task to implement changes in footer for adjusting colors and paddings to designs:\n```request\n[{\n"name": "Create task to adjust colors and paddings to designs in footer",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Adjust colors and paddings to designs in footer",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to adjust colors and paddings to designs in footer"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nHere is the request to create a task to implement changes in footer for adding common links:\n```request\n[{\n"name": "Create task to add common links in footer",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Add common links in footer",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to add common links in footer"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nHere is the request to create a task to implement changes in footer for adding newsletter form:\n```request\n[{\n"name": "Create task to add newsletter form in footer",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Add newsletter form in footer",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to add newsletter form in footer"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nReplace `PROJECT_KEY` with the actual key of your project. These requests will create three tasks in the specified project for implementing changes in the footer. ',
-  },
-  {
-    role: "user",
-    content:
       'For request: {"name":"Create task to adjust colors and paddings to designs in footer","url":"/rest/api/3/issue","method":"POST","body":{"fields":{"project":{"key":"PROJECT_KEY"},"summary":"Adjust colors and paddings to designs in footer","description":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"Task to adjust colors and paddings to designs in footer"}]}]},"issuetype":{"name":"Task"}\n}\n}\n}\nI got response: {"id":"10051","key":"PROJECT_KEY-45","self":"https://bobbylej.atlassian.net/rest/api/3/issue/10051"}\n\nFor request: {"name":"Create task to add common links in footer","url":"/rest/api/3/issue","method":"POST","body":{"fields":{"project":{"key":"PROJECT_KEY"},"summary":"Add common links in footer","description":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"Task to add common links in footer"}]}]},"issuetype":{"name":"Task"}\n}\n}\n}\nI got response: {"id":"10052","key":"PROJECT_KEY-46","self":"https://bobbylej.atlassian.net/rest/api/3/issue/10052"}\n\nFor request: {"name":"Create task to add newsletter form in footer","url":"/rest/api/3/issue","method":"POST","body":{"fields":{"project":{"key":"PROJECT_KEY"},"summary":"Add newsletter form in footer","description":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"Task to add newsletter form in footer"}]}]},"issuetype":{"name":"Task"}\n}\n}\n}\nI got response: {"id":"10053","key":"PROJECT_KEY-47","self":"https://your-organization.atlassian.net/rest/api/3/issue/10053"}',
   },
   {
@@ -107,7 +68,7 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      'Sure, here is the request to delete the task to add common links in footer:\n```request\n[{\n"name": "Delete task to add common links in footer",\n"url": "/rest/api/3/issue/PROJECT_KEY-46",\n"method": "DELETE"\n}]\n``` ',
+      '```request\n[{\n"name": "Delete task to add common links in footer",\n"url": "/rest/api/3/issue/PROJECT_KEY-46",\n"method": "DELETE"\n}]\n``` ',
   },
 ];
 

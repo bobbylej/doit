@@ -84,9 +84,7 @@ export const generateJiraRequests = async (actions, session) => {
 };
 
 export const convertTextMessageWithRequests = (message) => {
-  const startMarker = "//--START--//\n";
   const requestMarker = "//--REQUEST--//";
-  message = `${startMarker}${message}`;
   const notes = message
     .replace(JIRA_OPENAI_REQUEST_REGEX, requestMarker)
     .split(requestMarker)
@@ -103,8 +101,9 @@ export const convertTextMessageWithRequests = (message) => {
       content: requests,
     };
   });
-  const content = mergeArraysAlternately(notes, requests).flat();
-  content[0].content = content[0].content.replace(startMarker, "");
+  const isNoteFirst = notes[0]?.content !== "";
+  const arrays = isNoteFirst ? [notes, requests] : [requests, notes];
+  const content = mergeArraysAlternately(...arrays).flat().filter((item) => !!item.content);
   return content;
 };
 
