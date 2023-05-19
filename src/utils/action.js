@@ -72,6 +72,7 @@ export const generateRequests = async (text, userId) => {
     text,
     OPENAI_MESSAGE_ROLE.USER
   );
+  console.log(session);
   const aiMessage = await generateJiraChatRequests(session.messages, session);
   await pushMessageToSession(
     session.userId,
@@ -92,7 +93,7 @@ export const generateRequestsForUserInput = async (payload) => {
     const slackMessage = mergeSlackMessages(userInputMessage, requestsMessage);
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     await sendErrorResponseMessage(payload);
   }
 };
