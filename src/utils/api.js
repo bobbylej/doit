@@ -4,3 +4,10 @@ export const convertBodyForRequest = (body) => {
   }
   return JSON.stringify(body);
 };
+
+export const getRejectedPercentage = (promises) => {
+  return (
+    promises.filter((promise) => promise.status === PROMISE_STATUS.REJECTED)
+      .length / promises.length
+  );
+};

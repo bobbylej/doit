@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
-import { COLORS } from "../constants/colors.js";
-import { CONTENT_TYPE_REQUEST } from "../constants/jira-openai-prompts.js";
-import { PROMISE_STATUS } from "../constants/promise.js";
+import { COLORS } from "../constants/colors.constant.js";
+import { CONTENT_TYPE_REQUEST } from "../constants/content.constant.js";
+import { PROMISE_STATUS } from "../constants/promise.constant.js";
 import {
   SLACK_ACTION_API_KEYS_REQUIRED_TEXTS,
   SLACK_ACTION_DONE_TEXTS,
@@ -15,156 +15,15 @@ import {
   SLACK_ACTION_SUBMIT_REQUESTS,
   SLACK_ACTION_WHAT_TO_DO_TEXTS,
   SLACK_TEXT_MAX_LENGTH,
-} from "../constants/slack.js";
+} from "../constants/slack.constant.js";
 import { prettyPrintJSON } from "./object.js";
 import {
   JIRA_API_KEYS_LINK,
   OPENAI_API_KEYS_LINK,
   OPENAI_ORGANIZATION_ID_LINK,
-} from "../constants/links.js";
+} from "../constants/links.constant.js";
 import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
 import { splitTextByMaxLength } from "./array.js";
-
-export const requestToInteractiveBlock = (request, index) => {
-  const { name, ...requestDetails } = request;
-  const includeActionCheckboxOptions = [
-    {
-      text: {
-        type: "mrkdwn",
-        text: `*${name || "Request"}*`,
-      },
-      value: name || "Requests",
-    },
-  ];
-  return [
-    {
-      type: "divider",
-    },
-    {
-      type: "actions",
-      elements: [
-        {
-          type: "checkboxes",
-          action_id: `[${index}].include`,
-          options: includeActionCheckboxOptions,
-          initial_options: includeActionCheckboxOptions,
-        },
-      ],
-    },
-    {
-      type: "input",
-      element: {
-        type: "plain_text_input",
-        multiline: true,
-        action_id: `[${index}].request`,
-        initial_value: prettyPrintJSON(requestDetails),
-      },
-      label: {
-        type: "plain_text",
-        text: " ",
-        emoji: true,
-      },
-    },
-  ];
-};
-
-export const convertContentObjectToSlackMessage = (content) => {
-  let requestsIndex = 0;
-  const blocks = content.flatMap((item) => {
-    if (item.type === CONTENT_TYPE_REQUEST) {
-      return requestToInteractiveBlock(item.content, requestsIndex++);
-    }
-    return [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: item.content,
-        },
-      },
-    ];
-  });
-  const submitSection = generateSubmitRequestsSection(content);
-  return {
-    blocks: [...blocks, ...submitSection],
-  };
-};
-
-export const generateSubmitRequestsSection = (content) => {
-  const hasAnyRequest = countRequestsInContentObject(content) > 0;
-  const hasMultipleRequests = countRequestsInContentObject(content) > 1;
-  return hasAnyRequest
-    ? [
-        {
-          type: "divider",
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `_Need changes in requests? Edit in field(s) or tell me to do it for you._`,
-          },
-          accessory: {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: `Confirm and run ${
-                hasMultipleRequests ? "actions" : "action"
-              }`,
-              emoji: true,
-            },
-            value: "submit_requests",
-            action_id: SLACK_ACTION_SUBMIT_REQUESTS,
-            style: "primary",
-          },
-        },
-      ]
-    : [
-        {
-          type: "divider",
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `_Should I generate a request or do you want to share more details?_`,
-          },
-          accessory: {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: `Generate request`,
-              emoji: true,
-            },
-            value: "generate_requests",
-            action_id: SLACK_ACTION_GENERATE_REQUESTS,
-            style: "primary",
-          },
-        },
-      ];
-};
-
-export const countRequestsInContentObject = (content) => {
-  return content.reduce(
-    (counter, item) =>
-      item.type === CONTENT_TYPE_REQUEST ? counter + 1 : counter,
-    0
-  );
-};
-
-export const convertUserInputToSlackMessage = (text) => {
-  return {
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `_User: \`${text}\`_`,
-        },
-      },
-    ],
-  };
-};
 
 export const mergeSlackMessages = (...messages) => {
   return messages.reduce(
@@ -225,18 +84,29 @@ export const sendNotifyResponseMessage = (
   );
 };
 
+export const sendRandomNotifyTextMessage = (
+  payload,
+  texts,
+  { blocks, attachments } = {},
+  replaceOriginal = true
+) => {
+  const text = texts[Math.floor(Math.random() * texts.length)];
+  return sendNotifyResponseMessage(
+    payload,
+    { text, blocks, attachments },
+    replaceOriginal
+  );
+};
+
 export const sendSuccessResponseMessage = (
   payload,
   { blocks, attachments } = {},
   replaceOriginal = true
 ) => {
-  const text =
-    SLACK_ACTION_DONE_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_DONE_TEXTS.length)
-    ];
-  return sendNotifyResponseMessage(
+  return sendRandomNotifyTextMessage(
     payload,
-    { text, blocks, attachments },
+    SLACK_ACTION_DONE_TEXTS,
+    { blocks, attachments },
     replaceOriginal
   );
 };
@@ -245,13 +115,10 @@ export const sendErrorResponseMessage = (
   payload,
   { blocks, attachments } = {}
 ) => {
-  const text =
-    SLACK_ACTION_ERROR_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_ERROR_TEXTS.length)
-    ];
-  return sendNotifyResponseMessage(
+  return sendRandomNotifyTextMessage(
     payload,
-    { text, blocks, attachments },
+    SLACK_ACTION_ERROR_TEXTS,
+    { blocks, attachments },
     false
   );
 };
@@ -260,23 +127,20 @@ export const sendPartlyErrorResponseMessage = (
   payload,
   { blocks, attachments } = {}
 ) => {
-  const text =
-    SLACK_ACTION_PARTLY_ERROR_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_PARTLY_ERROR_TEXTS.length)
-    ];
-  return sendNotifyResponseMessage(
+  return sendRandomNotifyTextMessage(
     payload,
-    { text, blocks, attachments },
+    SLACK_ACTION_PARTLY_ERROR_TEXTS,
+    { blocks, attachments },
     false
   );
 };
 
 export const sendInProgressResponseMessage = (payload) => {
-  const text =
-    SLACK_ACTION_IN_PROGRESS_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_IN_PROGRESS_TEXTS.length)
-    ];
-  return sendNotifyResponseMessage(payload, { text });
+  return sendRandomNotifyTextMessage(payload, SLACK_ACTION_IN_PROGRESS_TEXTS);
+};
+
+export const sendWhatToDoMessage = (payload) => {
+  return sendRandomNotifyTextMessage(payload, SLACK_ACTION_WHAT_TO_DO_TEXTS);
 };
 
 export const sendNothingToDoResponseMessage = (payload) => {
@@ -292,99 +156,140 @@ export const sendNothingToDoResponseMessage = (payload) => {
   return sendNotifyResponseMessage(payload, { text }, false);
 };
 
-export const convertRequestErrorToSlackAttachment = (error) => {
-  const { name, ...request } = error.request;
-  return [
-    {
-      color: COLORS.RED,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `FAILED - *${name || "Request"}*`,
-          },
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
-          },
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `Error:\n\`\`\`${prettyPrintJSON(error.error)}\`\`\``,
-          },
-        },
-      ],
-    },
-  ];
-};
-
-export const convertRequestSuccessToSlackAttachment = (response) => {
-  const { name, ...request } = response.request;
-  const wrapper = {
-    start: "```\n",
-    end: "\n```",
-  }
-  const responseTextSplitted = splitTextByMaxLength(
-    prettyPrintJSON(response.response),
-    SLACK_TEXT_MAX_LENGTH - wrapper.start.length - wrapper.end.length
+export const sendAPIKeysRequiredResponseMessage = (payload, attachments) => {
+  return sendRandomNotifyTextMessage(
+    payload,
+    SLACK_ACTION_API_KEYS_REQUIRED_TEXTS,
+    { attachments },
+    false
   );
+};
+
+export const convertRequestToInteractiveBlock = (request, index) => {
+  const { name, ...requestDetails } = request;
+  const includeActionCheckboxOptions = [
+    {
+      text: {
+        type: "mrkdwn",
+        text: `*${name || "Request"}*`,
+      },
+      value: name || "Requests",
+    },
+  ];
   return [
     {
-      color: COLORS.GREEN,
-      blocks: [
+      type: "divider",
+    },
+    {
+      type: "actions",
+      elements: [
         {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `SUCCEED - *${name || "Request"}*`,
-          },
+          type: "checkboxes",
+          action_id: `[${index}].include`,
+          options: includeActionCheckboxOptions,
+          initial_options: includeActionCheckboxOptions,
         },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
-          },
-        },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `Response:`,
-          },
-        },
-        ...responseTextSplitted.map((text) => ({
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `${wrapper.start}${text}${wrapper.end}`,
-          },
-        })),
       ],
+    },
+    {
+      type: "input",
+      element: {
+        type: "plain_text_input",
+        multiline: true,
+        action_id: `[${index}].request`,
+        initial_value: prettyPrintJSON(requestDetails),
+      },
+      label: {
+        type: "plain_text",
+        text: " ",
+        emoji: true,
+      },
     },
   ];
 };
 
-export const convertResponsesToSlackAttachments = (responses) => {
-  if (Array.isArray(responses)) {
-    return responses.flatMap((response) => {
-      switch (response.status) {
-        case PROMISE_STATUS.FULFILLED:
-          return convertRequestSuccessToSlackAttachment(response.value);
-        case PROMISE_STATUS.REJECTED:
-          return (
-            response.reason?.request &&
-            convertRequestErrorToSlackAttachment(response.reason)
-          );
-      }
-    });
-  }
+export const convertContentObjectToSlackMessage = (content) => {
+  let requestsIndex = 0;
+  const blocks = content.flatMap((item) => {
+    if (item.type === CONTENT_TYPE_REQUEST) {
+      return convertRequestToInteractiveBlock(item.content, requestsIndex++);
+    }
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: item.content,
+        },
+      },
+    ];
+  });
+  const submitSection = generateSubmitRequestsSection(content);
+  return {
+    blocks: [...blocks, ...submitSection],
+  };
+};
+
+export const generateSubmitRequestsSection = (content) => {
+  const countRequestsInContentObject = (content) => {
+    return content.reduce(
+      (counter, item) =>
+        item.type === CONTENT_TYPE_REQUEST ? counter + 1 : counter,
+      0
+    );
+  };
+
+  const hasAnyRequest = countRequestsInContentObject(content) > 0;
+  const hasMultipleRequests = countRequestsInContentObject(content) > 1;
+  return hasAnyRequest
+    ? [
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `_Need changes in requests? Edit in field(s) or tell me to do it for you._`,
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: `Confirm and run ${
+                hasMultipleRequests ? "actions" : "action"
+              }`,
+              emoji: true,
+            },
+            value: "submit_requests",
+            action_id: SLACK_ACTION_SUBMIT_REQUESTS,
+            style: "primary",
+          },
+        },
+      ]
+    : [
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `_Should I generate a request or do you want to share more details?_`,
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: `Generate request`,
+              emoji: true,
+            },
+            value: "generate_requests",
+            action_id: SLACK_ACTION_GENERATE_REQUESTS,
+            style: "primary",
+          },
+        },
+      ];
 };
 
 export const generateProvideAPIKeysMessage = () => {
@@ -481,27 +386,111 @@ export const generateProvideAPIKeysMessage = () => {
   };
 };
 
-export const sendWhatToDoMessage = (payload) => {
-  const text =
-    SLACK_ACTION_WHAT_TO_DO_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_WHAT_TO_DO_TEXTS.length)
-    ];
-  const blocks = [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text,
+export const convertUserInputToSlackMessage = (text) => {
+  return {
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `_User: \`${text}\`_`,
+        },
       },
-    },
-  ];
-  return sendSuccessResponseMessage(payload, { blocks });
+    ],
+  };
 };
 
-export const sendAPIKeysRequiredResponseMessage = (payload, attachments) => {
-  const text =
-    SLACK_ACTION_API_KEYS_REQUIRED_TEXTS[
-      Math.floor(Math.random() * SLACK_ACTION_API_KEYS_REQUIRED_TEXTS.length)
-    ];
-  return sendNotifyResponseMessage(payload, { text, attachments }, false);
+export const convertRequestErrorToSlackAttachment = (error) => {
+  const { name, ...request } = error.request;
+  return [
+    {
+      color: COLORS.RED,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `FAILED - *${name || "Request"}*`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `Error:\n\`\`\`${prettyPrintJSON(error.error)}\`\`\``,
+          },
+        },
+      ],
+    },
+  ];
+};
+
+export const convertRequestSuccessToSlackAttachment = (response) => {
+  const { name, ...request } = response.request;
+  const wrapper = {
+    start: "```\n",
+    end: "\n```",
+  };
+  const responseTextSplitted = splitTextByMaxLength(
+    prettyPrintJSON(response.response),
+    SLACK_TEXT_MAX_LENGTH - wrapper.start.length - wrapper.end.length
+  );
+  return [
+    {
+      color: COLORS.GREEN,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `SUCCEED - *${name || "Request"}*`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `\`\`\`${prettyPrintJSON(request)}\`\`\``,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `Response:`,
+          },
+        },
+        ...responseTextSplitted.map((text) => ({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `${wrapper.start}${text}${wrapper.end}`,
+          },
+        })),
+      ],
+    },
+  ];
+};
+
+export const convertResponsesToSlackAttachments = (responses) => {
+  if (Array.isArray(responses)) {
+    return responses.flatMap((response) => {
+      switch (response.status) {
+        case PROMISE_STATUS.FULFILLED:
+          return convertRequestSuccessToSlackAttachment(response.value);
+        case PROMISE_STATUS.REJECTED:
+          return (
+            response.reason?.request &&
+            convertRequestErrorToSlackAttachment(response.reason)
+          );
+      }
+    });
+  }
 };

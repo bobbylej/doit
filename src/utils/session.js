@@ -1,9 +1,6 @@
-import {
-  JIRA_OPENAI_INIT_MESSAGES,
-  JIRA_OPENAI_SYSTEM_MESSAGES,
-  OPENAI_MESSAGE_ROLE,
-} from "../constants/jira-openai-prompts.js";
-import { SESSION_MAX_AGE } from "../constants/session.js";
+import { JIRA_OPENAI_INIT_MESSAGES } from "../constants/content.constant.js";
+import { OPENAI_MESSAGE_ROLE } from "../constants/openai.constant.js";
+import { SESSION_MAX_AGE } from "../constants/session.constant.js";
 import { SESSION_MODEL_API_KEYS, Session } from "../models/session.model.js";
 
 export const getSession = async (userId) => {
@@ -59,7 +56,9 @@ export const pushMessageToSession = async (userId, message, role) => {
       status: 404,
       message: "Session for user not found",
     });
-  const messages = session?.messages.length ?session?.messages : JIRA_OPENAI_INIT_MESSAGES;
+  const messages = session?.messages.length
+    ? session?.messages
+    : JIRA_OPENAI_INIT_MESSAGES;
   messages.push({ role, content: message });
   return setSession(userId, { messages });
 };

@@ -1,16 +1,14 @@
+import { JIRA_OPENAI_GENERATE_REQUESTS_PROMPT } from "../constants/content.constant.js";
+import { OPENAI_MESSAGE_ROLE } from "../constants/openai.constant.js";
+import { getRejectedPercentage } from "./api.js";
 import {
-  JIRA_OPENAI_GENERATE_REQUESTS_PROMPT,
-  OPENAI_MESSAGE_ROLE,
-} from "../constants/jira-openai-prompts.js";
-import {
-  bulkJira,
   convertSlackStateObject,
   convertSlackStateObjectToRequests,
   convertTextMessageWithRequests,
   filterIncludedRequests,
-  generateJiraChatRequests,
-  getRejectedPercentage,
-} from "./jira.js";
+} from "./content.js";
+import { bulkJira } from "./jira.js";
+import { createChatCompletion } from "./openai.js";
 import {
   clearMessagesInSession,
   getSession,
@@ -55,31 +53,20 @@ export const askForAPIKeys = async (payload) => {
 };
 
 export const storeApiKeys = async (payload) => {
-  const userId = payload.user.id;
-  const apiKeys = convertSlackStateObject(payload.state.values);
-  const areApiKeysValid = validateSessionAPIKeys(apiKeys);
-  if (!areApiKeysValid) {
-    await sendAPIKeysRequiredResponseMessage(payload);
-    return;
+  try {
+    const userId = payload.user.id;
+    const apiKeys = convertSlackStateObject(payload.state.values);
+    const areApiKeysValid = validateSessionAPIKeys(apiKeys);
+    if (!areApiKeysValid) {
+      await sendAPIKeysRequiredResponseMessage(payload);
+      return;
+    }
+    await setSessionAPIKeys(userId, apiKeys);
+    await sendWhatToDoMessage(payload);
+  } catch (error) {
+    console.error(error);
+    await sendErrorResponseMessage(payload);
   }
-  await setSessionAPIKeys(userId, apiKeys);
-  await sendWhatToDoMessage(payload);
-};
-
-export const generateRequests = async (text, userId) => {
-  const session = await pushMessageToSession(
-    userId,
-    text,
-    OPENAI_MESSAGE_ROLE.USER
-  );
-  const aiMessage = await generateJiraChatRequests(session.messages, session);
-  await pushMessageToSession(
-    session.userId,
-    aiMessage,
-    OPENAI_MESSAGE_ROLE.ASSISTANT
-  );
-  const content = convertTextMessageWithRequests(aiMessage);
-  return convertContentObjectToSlackMessage(content);
 };
 
 export const generateRequestsForUserInput = async (payload) => {
@@ -92,7 +79,7 @@ export const generateRequestsForUserInput = async (payload) => {
     const slackMessage = mergeSlackMessages(userInputMessage, requestsMessage);
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(error);
+    console.error(error.response);
     await sendErrorResponseMessage(payload);
   }
 };
@@ -112,19 +99,19 @@ export const generateRequestsForPreviousMessage = async (payload) => {
 
 export const submitRequests = async (payload) => {
   const userId = payload.user_id || payload.user.id;
-  const session = await getSession(userId);
-  if (!session) {
-    await askForAPIKeys(payload);
-    return;
-  }
   try {
+    const session = await getSession(userId);
+    if (!session) {
+      await askForAPIKeys(payload);
+      return;
+    }
     const allRequests = convertSlackStateObjectToRequests(payload.state.values);
     const requests = filterIncludedRequests(allRequests);
-    if (!requests.length) {
+    if (requests.length === 0) {
       return sendNothingToDoResponseMessage(payload);
     }
     const areAllRequestsIncluded = allRequests.length === requests.length;
-    const responses = requests && (await bulkJira(requests, session));
+    const responses = await bulkJira(requests, session);
     const slackAttachments = convertResponsesToSlackAttachments(responses);
     await sendSuccessResponseMessage(
       payload,
@@ -133,19 +120,21 @@ export const submitRequests = async (payload) => {
       },
       areAllRequestsIncluded
     );
-    pushMessageWithResponsesToSession(session.userId, responses);
+    pushMessageWithResponsesToSession(userId, responses);
   } catch (error) {
     console.error(error);
     const rejectedPercentage = Array.isArray(error)
       ? getRejectedPercentage(error)
       : 1;
     const slackAttachments = convertResponsesToSlackAttachments(error);
-    rejectedPercentage === 1
-      ? sendErrorResponseMessage(payload, { attachments: slackAttachments })
-      : sendPartlyErrorResponseMessage(payload, {
-          attachments: slackAttachments,
-        });
-    pushMessageWithResponsesToSession(session.userId, error);
+    if (rejectedPercentage === 1) {
+      sendErrorResponseMessage(payload, { attachments: slackAttachments });
+    } else {
+      sendPartlyErrorResponseMessage(payload, {
+        attachments: slackAttachments,
+      });
+    }
+    pushMessageWithResponsesToSession(userId, error);
   }
 };
 
@@ -158,4 +147,20 @@ export const clearSessionMessages = async (payload) => {
     console.error(error);
     await sendErrorResponseMessage(payload);
   }
+};
+
+const generateRequests = async (text, userId) => {
+  const session = await pushMessageToSession(
+    userId,
+    text,
+    OPENAI_MESSAGE_ROLE.USER
+  );
+  const aiMessage = await createChatCompletion(session.messages, session);
+  await pushMessageToSession(
+    session.userId,
+    aiMessage,
+    OPENAI_MESSAGE_ROLE.ASSISTANT
+  );
+  const content = convertTextMessageWithRequests(aiMessage);
+  return convertContentObjectToSlackMessage(content);
 };

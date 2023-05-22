@@ -4,7 +4,7 @@ import {
   SLACK_ACTION_GENERATE_REQUESTS,
   SLACK_ACTION_PROVIDE_API_KEYS,
   SLACK_ACTION_SUBMIT_REQUESTS,
-} from "./constants/slack.js";
+} from "./constants/slack.constant.js";
 import {
   askForAPIKeys,
   chat,
