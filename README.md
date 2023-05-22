@@ -10,11 +10,11 @@ This repository contains the server code for a Doit Jira Slack app. The server i
 
 Set API Keys and create, delete, move tasks in Jira:
 
-https://github.com/bobbylej/doit/assets/11492703/6a5fbdf5-9595-4269-9813-78120b1b7785
+https://github.com/bobbylej/doit/assets/11492703/1490a64f-cf90-4816-931b-ada7da142043
 
 Create epics and tasks in Jira:
 
-https://github.com/bobbylej/doit/assets/11492703/b1d25ff1-4209-46bb-a6c1-14d9552f1c1a
+https://github.com/bobbylej/doit/assets/11492703/a994b091-b7d2-403b-88b5-4358bae8887f
 
 ## Getting Started
 
