@@ -6,6 +6,16 @@ This app is currently in an **experimental phase** and is not recommended for pr
 
 This repository contains the server code for a Doit Jira Slack app. The server is responsible for handling incoming requests from Slack and performing various actions based on those requests. It uses Node.js and Express framework for building the server. 
 
+## Demo
+
+Set API Keys and create, delete, move tasks in Jira:
+
+https://github.com/bobbylej/doit/assets/11492703/6a5fbdf5-9595-4269-9813-78120b1b7785
+
+Create epics and tasks in Jira:
+
+https://github.com/bobbylej/doit/assets/11492703/b1d25ff1-4209-46bb-a6c1-14d9552f1c1a
+
 ## Getting Started
 
 To get started with the Doit Slack app server, follow these steps:
@@ -103,7 +113,7 @@ If you'd like to contribute to this project, please follow these guidelines:
 
 ## License
 
-This project is licensed under the ISC License. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
 ## Author
 
