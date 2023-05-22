@@ -1,6 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { encode } from "gpt-3-encoder";
 import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
+import { OPENAI_MAX_TOKENS, OPENAI_MESSAGE_ROLE, OPENAI_MIN_MARGIN_TOKENS } from "../constants/openai.constant.js";
 
 const models = {
   chatCompletionModel: process.env.OPENAI_API_CHAT_COMPLETION_MODEL,
