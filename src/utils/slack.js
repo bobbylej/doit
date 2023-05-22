@@ -17,13 +17,8 @@ import {
   SLACK_TEXT_MAX_LENGTH,
 } from "../constants/slack.constant.js";
 import { prettyPrintJSON } from "./object.js";
-import {
-  JIRA_API_KEYS_LINK,
-  OPENAI_API_KEYS_LINK,
-  OPENAI_ORGANIZATION_ID_LINK,
-} from "../constants/links.constant.js";
-import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
 import { splitTextByMaxLength } from "./array.js";
+import { SESSION_API_KEYS_FIELDS } from "../constants/session.constant.js";
 
 export const mergeSlackMessages = (...messages) => {
   return messages.reduce(
@@ -293,22 +288,22 @@ export const generateSubmitRequestsSection = (content) => {
 };
 
 export const generateProvideAPIKeysMessage = () => {
-  const generateInput = ({ actionId, label, placeholder, helpText }) => {
+  const generateInput = ({ key, label, placeholder, helpText, required }) => {
     return [
       {
         type: "input",
         element: {
           type: "plain_text_input",
-          action_id: actionId,
+          action_id: key,
           placeholder: {
             type: "plain_text",
-            text: placeholder,
+            text: `${placeholder}${required ? " (required)" : ""}`,
             emoji: true,
           },
         },
         label: {
           type: "plain_text",
-          text: label,
+          text: `${label}${required ? "*" : ""}`,
           emoji: true,
         },
       },
@@ -334,36 +329,7 @@ export const generateProvideAPIKeysMessage = () => {
           emoji: true,
         },
       },
-      ...generateInput({
-        actionId: SESSION_MODEL_API_KEYS.OPENAI_API_KEY,
-        label: "OpenAI API Key*",
-        placeholder: "Provide OpenAI API Key (required)",
-        helpText: `To create API key for OpenAI please visit ${OPENAI_API_KEYS_LINK}.`,
-      }),
-      ...generateInput({
-        actionId: SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID,
-        label: "OpenAI Organization ID",
-        placeholder: "Provide OpenAI Organization ID",
-        helpText: `To get Organization ID for OpenAI please visit ${OPENAI_ORGANIZATION_ID_LINK}.`,
-      }),
-      ...generateInput({
-        actionId: SESSION_MODEL_API_KEYS.JIRA_API_KEY,
-        label: "JIRA API Key*",
-        placeholder: "Provide JIRA API Key (required)",
-        helpText: `To get API key for JIRA please visit ${JIRA_API_KEYS_LINK}.`,
-      }),
-      ...generateInput({
-        actionId: SESSION_MODEL_API_KEYS.JIRA_HOST,
-        label: "JIRA Host*",
-        placeholder: "Provide JIRA Host (required)",
-        helpText: `Provide it in format: _your-organization.atlassian.net_.`,
-      }),
-      ...generateInput({
-        actionId: SESSION_MODEL_API_KEYS.JIRA_USERNAME,
-        label: "JIRA Username*",
-        placeholder: "Provide JIRA Username (required)",
-        helpText: `That is your email used in JIRA.`,
-      }),
+      ...SESSION_API_KEYS_FIELDS.flatMap(field => generateInput(field)),
       {
         type: "section",
         text: {

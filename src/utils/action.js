@@ -8,7 +8,7 @@ import {
   filterIncludedRequests,
 } from "./content.js";
 import { bulkJira } from "./jira.js";
-import { countMessagesToKeep, countTokensInMessages, createChatCompletion, getLastMessages, getMessagesForChatCompletion } from "./openai.js";
+import { createChatCompletion, getMessagesForChatCompletion } from "./openai.js";
 import {
   clearMessagesInSession,
   getSession,

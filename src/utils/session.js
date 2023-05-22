@@ -1,6 +1,9 @@
 import { JIRA_OPENAI_INIT_MESSAGES } from "../constants/content.constant.js";
 import { OPENAI_MESSAGE_ROLE } from "../constants/openai.constant.js";
-import { SESSION_MAX_AGE } from "../constants/session.constant.js";
+import {
+  SESSION_API_KEYS_FIELDS,
+  SESSION_MAX_AGE,
+} from "../constants/session.constant.js";
 import { SESSION_MODEL_API_KEYS, Session } from "../models/session.model.js";
 
 export const getSession = async (userId) => {
@@ -26,13 +29,25 @@ export const destroySession = async (userId) => {
 };
 
 export const setSessionAPIKeys = async (userId, apiKeys) => {
-  return setSession(userId, apiKeys);
+  const defaultApiKeys = {
+    jiraApiKey: process.env.JIRA_API_TOKEN,
+    jiraHost: process.env.JIRA_HOST,
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    openAIOrganization: process.env.OPENAI_API_ORGANIZATION,
+  }
+  return setSession(userId, {
+    [SESSION_MODEL_API_KEYS.OPENAI_API_KEY]: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY] || defaultApiKeys.openAIApiKey,
+    [SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID]: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID] || defaultApiKeys.openAIOrganization,
+    [SESSION_MODEL_API_KEYS.JIRA_API_KEY]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_API_KEY] || defaultApiKeys.jiraApiKey,
+    [SESSION_MODEL_API_KEYS.JIRA_HOST]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_HOST] || defaultApiKeys.jiraHost,
+    [SESSION_MODEL_API_KEYS.JIRA_USERNAME]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_USERNAME],
+  });
 };
 
 export const validateSessionAPIKeys = (apiKeys) => {
-  const requiredApiKeys = Object.values(SESSION_MODEL_API_KEYS).filter(
-    (key) => key !== SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID
-  );
+  const requiredApiKeys = SESSION_API_KEYS_FIELDS.filter(
+    (field) => field.required
+  ).map((field) => field.key);
   const hasAllRequiredApiKeys = requiredApiKeys.every((key) => {
     return apiKeys[key];
   });

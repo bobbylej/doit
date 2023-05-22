@@ -10,8 +10,8 @@ const models = {
 
 export const createChatCompletion = async (messages, apiKeys) => {
   const configuration = new Configuration({
-    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
     apiKey: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY],
+    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
   });
   const openAI = new OpenAIApi(configuration);
   const completion = await openAI.createChatCompletion({

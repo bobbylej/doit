@@ -25,7 +25,44 @@ To get started with the Doit Slack app server, follow these steps:
 3. Create a `.env` file in the root directory of the project and add your environment variables. You can refer to the `.env.example` file for the required variables.
 4. Start the server: `npm start`
 5. The server should now be running on `http://localhost:3000`.
-6. To interact with slack app create publicity accessible URL or use development proxy like [ngrok](https://ngrok.com/). 
+6. To interact with slack app create publicity accessible URL or use development proxy like [ngrok](https://ngrok.com/).
+
+## Environmental Variables
+
+To configure the project, you need to set up the following environmental variables. Follow these steps:
+
+1. Create a `.env` file in the root directory of the project.
+2. Add the required environment variables listed below. You can refer to the `.env.example` file for the required variables' format.
+
+### Required Variables
+
+- `OPENAI_API_CHAT_COMPLETION_MODEL` - This is a required variable that specifies the OpenAI model used for chat completion. You can find a list of available models [here](https://platform.openai.com/docs/models/gpt-4). We recommend using the `gpt-3.5-turbo` model.
+
+- `OPENAI_API_MAX_TOKENS` - This is a required variable that sets the maximum number of tokens for the chosen model. You can find the appropriate value for your model [here](https://platform.openai.com/docs/models/gpt-4).
+
+- `MONGODB_URL` - This is a required variable that specifies the URL to your MongoDB instance. It is necessary for storing API keys and messages for the users.
+
+- `MONGODB_DBNAME` - This is a required variable that defines the name of the MongoDB database.
+
+- `MONGODB_SESSIONS_COLLECTION` - This is a required variable that sets the name of the collection within the MongoDB database.
+
+- `MONGODB_ENCRYPTION_KEY` - This is a required variable used to encrypt data in the database. It should be a 32-byte base64 string.
+
+- `MONGODB_SIGNING_KEY` - This is a required variable used to sign data in the database. It should be a 64-byte base64 string.
+
+### Optional Variables
+
+The following variables are optional, but you can provide them if needed:
+
+- `OPENAI_API_KEY` - This is an optional variable that allows you to provide your OpenAI API Key. If you don't provide this value, users will be required to provide their own API Key.
+
+- `OPENAI_API_ORGANIZATION` - This is an optional variable that allows you to provide your OpenAI Organization ID. If you don't provide this value, users will be required to provide their own Organization ID.
+
+- `JIRA_API_TOKEN` - This is an optional variable that specifies the API Token for Jira REST API. If you don't provide this value, users will be required to provide their own API Token.
+
+- `JIRA_HOST` - This is an optional variable that defines the host for the Jira REST API. It should be provided in the format: *your-organization.atlassian.net*. If you don't provide this value, users will be required to provide their own API Token.
+
+Make sure to set these environmental variables in your `.env` file before running the project.
 
 ## Installing and Running MongoDB Locally
 
