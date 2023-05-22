@@ -8,7 +8,7 @@ import {
   filterIncludedRequests,
 } from "./content.js";
 import { bulkJira } from "./jira.js";
-import { createChatCompletion } from "./openai.js";
+import { countMessagesToKeep, countTokensInMessages, createChatCompletion, getLastMessages, getMessagesForChatCompletion } from "./openai.js";
 import {
   clearMessagesInSession,
   getSession,
@@ -149,13 +149,14 @@ export const clearSessionMessages = async (payload) => {
   }
 };
 
-const generateRequests = async (text, userId) => {
+export const generateRequests = async (text, userId) => {
   const session = await pushMessageToSession(
     userId,
     text,
     OPENAI_MESSAGE_ROLE.USER
   );
-  const aiMessage = await createChatCompletion(session.messages, session);
+  const messages = getMessagesForChatCompletion(session.messages);
+  const aiMessage = await createChatCompletion(messages, session);
   await pushMessageToSession(
     session.userId,
     aiMessage,
