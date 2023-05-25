@@ -38,7 +38,11 @@ To configure the project, you need to set up the following environmental variabl
 
 - `OPENAI_API_CHAT_COMPLETION_MODEL` - This is a required variable that specifies the OpenAI model used for chat completion. You can find a list of available models [here](https://platform.openai.com/docs/models/gpt-4). We recommend using the `gpt-3.5-turbo` model.
 
-- `OPENAI_API_MAX_TOKENS` - This is a required variable that sets the maximum number of tokens for the chosen model. You can find the appropriate value for your model [here](https://platform.openai.com/docs/models/gpt-4).
+- `OPENAI_API_TEXT_COMPLETION_MODEL` - This is a required variable that specifies the OpenAI model used for text completion. You can find a list of available models [here](https://platform.openai.com/docs/models/gpt-4). We recommend using the `text-davinci-003` model.
+
+- `OPENAI_API_CHAT_COMPLETION_MAX_TOKENS` - This is a required variable that sets the maximum number of tokens for the chosen model used for chat completion. You can find the appropriate value for your model [here](https://platform.openai.com/docs/models/gpt-4).
+
+- `OPENAI_API_COMPLETION_MAX_TOKENS` - This is a required variable that sets the maximum number of tokens for the chosen model used for text completion. You can find the appropriate value for your model [here](https://platform.openai.com/docs/models/gpt-4).
 
 - `MONGODB_URL` - This is a required variable that specifies the URL to your MongoDB instance. It is necessary for storing API keys and messages for the users.
 
@@ -53,6 +57,8 @@ To configure the project, you need to set up the following environmental variabl
 ### Optional Variables
 
 The following variables are optional, but you can provide them if needed:
+
+- `OPENAI_API_COMPLETION_TYPE` - This is an optional variable that specifies the OpenAI completion type to be used. You can choose between `chat` and `text` completion. We recommend using the `chat` completion and this is the default type.
 
 - `OPENAI_API_KEY` - This is an optional variable that allows you to provide your OpenAI API Key. If you don't provide this value, users will be required to provide their own API Key.
 
