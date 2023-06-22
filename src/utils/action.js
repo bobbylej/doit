@@ -79,7 +79,7 @@ export const generateRequestsForUserInput = async (payload) => {
     const slackMessage = mergeSlackMessages(userInputMessage, requestsMessage);
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(error.response);
+    console.error(error);
     await sendErrorResponseMessage(payload);
   }
 };

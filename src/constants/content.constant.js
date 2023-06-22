@@ -26,7 +26,7 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      '```request\n[{\nname: \'Create Task to store API Keys in DB\',\nurl: \'/rest/api/3/issue\',\nmethod: \'POST\',\nbody: {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Store API keys in DB",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to store API keys in a database"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nThis request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database".',
+      '```request\n[{\"nname": "Create Task to store API Keys in DB",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Store API keys in DB",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to store API keys in a database"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nThis request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database".',
   },
   {
     role: "user",
@@ -36,7 +36,7 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      "```request\n[{\nname: 'Create filter for tasks with TODO label',\nurl: '/rest/api/3/filter',\nmethod: 'POST',\nbody: {\njql: 'project=PROJECT_KEY and labels=TODO',\nname: 'TODO tasks filter',\ndescription: 'Filter to get all tasks with TODO label',\nfavourite: false\n}\n}]\n```\nYou can modify the name and description as per your requirements.",
+      "```request\n[{\n\"name\": \"Create filter for tasks with TODO label\",\n\"url\": \"/rest/api/3/filter\",\n\"method\": \"POST\",\n\"body\": {\n\"jql\": \"project=PROJECT_KEY and labels=TODO\",\n\"name\": \"TODO tasks filter\",\n\"description\": \"Filter to get all tasks with TODO label\",\n\"favourite\": false\n}\n}]\n```\nYou can modify the name and description as per your requirements.",
   },
   { role: "user", content: "Create epic called Server in PROJECT_KEY project" },
   {
