@@ -26,7 +26,7 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
   {
     role: "assistant",
     content:
-      '```request\n[{\"nname": "Create Task to store API Keys in DB",\n"url": "/rest/api/3/issue",\n"method": "POST",\n"body": {\n"fields": {\n"project": {\n"key": "PROJECT_KEY"\n},\n"summary": "Store API keys in DB",\n"description": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Task to store API keys in a database"\n}\n]\n}\n]\n},\n"issuetype": {\n"name": "Task"\n}\n}\n}\n}]\n```\nThis request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database".',
+      '```request\n[{\"name\": \"Create Task to store API Keys in DB\",\n\"url\": \"/rest/api/3/issue\",\n\"method\": \"POST\",\n\"body\": {\n\"fields\": {\n\"project\": {\n\"key\": \"PROJECT_KEY\"\n},\n\"summary\": \"Store API keys in DB\",\n\"description\": {\n\"type\": \"doc\",\n\"version\": 1,\n\"content\": [\n{\n\"type\": \"paragraph\",\n\"content\": [\n{\n\"type\": \"text\",\n\"text\": \"Task to store API keys in a database\"\n},\n{\n\"type\":\"orderedList\",\n\"content\":[\n{\n\"type\":\"listItem\",\n\"content\":[\n{\n\"type\":\"paragraph\",\n\"content\":[\n{\n\"type\":\"text\",\n\"text\":\"Navigate to the login page.\"\n}\n]\n}\n]\n}\n]\n}]\n}\n]\n},\n\"issuetype\": {\n\"name\": \"Task\"\n}\n}\n}\n}]\n```\nThis request will create a new task with the summary "Store API keys in DB" and the description "Task to store API keys in a database".',
   },
   {
     role: "user",
