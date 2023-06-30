@@ -16,23 +16,33 @@ Create epics and tasks in Jira:
 
 https://github.com/bobbylej/doit/assets/11492703/a994b091-b7d2-403b-88b5-4358bae8887f
 
+## Usage notes
+
+1. **It forgets messages** - The app has a limited message storage capacity, so it may eventually „forget” previous messages.
+1. **It doesn't know what is inside the Jira Board** - The app is not aware of the content of the Jira Board, except for the issues, tasks, and epics mentioned in previous messages.
+1. **It may generate requests in wrong format** - When certain attributes have special formats, the chat may generate content in the wrong format. For example, it may mishandle descriptions until it encounters a training message or any other message with a proper description attribute. The same applies to JQL for search.
+1. **Put independent jobs in single message** - The app works best when handling one job at a time or unrelated multiple jobs simultaneously. For instance, if you want to create an epic and tasks within the epic in a single message, you’ll need to modify the requests to include the epic’s key in the tasks. 
+1. **Don't put too many jobs at once** - It's important to avoid putting too many jobs in a single message due to the limited number of tokens available. If the message becomes too long, it may get cut off, potentially impacting the desired functionality. To ensure optimal performance, it's recommended to keep each job or task within a reasonable length to avoid token limitations.
+1. **For complex jobs use Jira web app** - The Jira API can be complex in many cases, making certain tasks more straightforward to perform using the web app interface. For example, creating custom attributes within the issues of a project is easier to accomplish within the Jira web app.
+1. **Clean the chat from time to time** - After changing the context, it is beneficial to utilize the `doit-clear` command for at least two reasons. Firstly, it serves as a reminder to the chat about the training messages, helping to maintain contextual understanding. Secondly, it helps conserve tokens by clearing any unnecessary information from previous requests, optimizing the token usage for each subsequent request.
+
 ## Getting Started
 
 To get started with the Doit Slack app server, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/bobbylej/doit.git`
-2. Install the dependencies: `npm install`
-3. Create a `.env` file in the root directory of the project and add your environment variables. You can refer to the `.env.example` file for the required variables.
-4. Start the server: `npm start`
-5. The server should now be running on `http://localhost:3000`.
-6. To interact with slack app create publicity accessible URL or use development proxy like [ngrok](https://ngrok.com/).
+1. Install the dependencies: `npm install`
+1. Create a `.env` file in the root directory of the project and add your environment variables. You can refer to the `.env.example` file for the required variables.
+1. Start the server: `npm start`
+1. The server should now be running on `http://localhost:3000`.
+1. To interact with slack app create publicity accessible URL or use development proxy like [ngrok](https://ngrok.com/).
 
 ## Environmental Variables
 
 To configure the project, you need to set up the following environmental variables. Follow these steps:
 
 1. Create a `.env` file in the root directory of the project.
-2. Add the required environment variables listed below. You can refer to the `.env.example` file for the required variables' format.
+1. Add the required environment variables listed below. You can refer to the `.env.example` file for the required variables' format.
 
 ### Required Variables
 
@@ -75,14 +85,14 @@ Make sure to set these environmental variables in your `.env` file before runnin
 The server uses MongoDB as the database. Follow the steps below to install and run MongoDB locally:
 
 1. Download MongoDB Community Server: Visit the [MongoDB Download Center](https://www.mongodb.com/try/download/community) and download the appropriate version for your operating system.
-2. Install MongoDB: Run the installer and follow the installation instructions for your operating system.
-3. Configure the MongoDB Environment:
+1. Install MongoDB: Run the installer and follow the installation instructions for your operating system.
+1. Configure the MongoDB Environment:
    - Create the data directory: By default, MongoDB stores data in the `/data/db` directory. Create this directory in the root of your system drive (e.g., `C:\data\db` on Windows or `/data/db` on macOS/Linux).
    - Add the MongoDB bin directory to your system's PATH environment variable: The bin directory is typically located in the MongoDB installation directory (e.g., `C:\Program Files\MongoDB\Server\{version}\bin` on Windows or `/usr/local/bin` on macOS/Linux). Add this directory to your system's PATH variable to access MongoDB from the command line.
-4. Start the MongoDB Server:
+1. Start the MongoDB Server:
    - Open a command prompt or terminal window.
    - Run the following command to start the MongoDB server: `mongod`
-5. Verify the MongoDB Installation:
+1. Verify the MongoDB Installation:
    - Open another command prompt or terminal window.
    - Run the following command to start the MongoDB shell: `mongo`
    - If MongoDB is running successfully, you will see a MongoDB shell prompt (`>`) in the new window.
@@ -94,16 +104,16 @@ Now, you have MongoDB installed and running locally. The server will be able to 
 To use this server with a Slack app, you need to create a Slack app and configure it to interact with the server. Here are the steps to create a Slack app:
 
 1. Go to the [Slack API website](https://api.slack.com/apps) and click on "Create New App".
-2. Provide a name and select the workspace where you want to install the app.
-3. Under the "Features" section, click on "OAuth & Permissions" to configure the app's OAuth scopes and redirect URLs.
-4. Add `channels:read`, `chat:write` and `commands` OAuth scopes in "Bot token scopes" section for your app to access the required features. Make sure to include the necessary scopes for your server to interact with Slack.
-5. Enable interactivity and set the request URL to your server's endpoint for handling Slack interactions (e.g., `https://some-generated-hash.ngrok-free.app/interact`).
-6. Under the "Features" section, click on "Slash Commands" to create three commands:
-- `/doit` - The main command to provide description of actions by slack user and chat with AI assistant. Set the "Request URL" to `/` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/`).
-- `/doit-clear` - The command to clear user's messages history. User's sessions together with messages are removed after 24h of idle. Still, it's recommended to run this command before changing context of the chat, to limit tokens sent to OpenAI API. Set the "Request URL" to `/clear` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/clear`).
-- `/doit-api-keys` - The command to set API Keys and other data required for third party APIs: OpenAI API and JIRA REST API. User will be asked to provide this data if he_r session doesn't exist whenever hits `/doit` command, but still it's recommended to keep this command if user will want to change its API Keys. Set the "Request URL" to `/api-keys` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/api-keys`).
-7. Go to the "Install App" section.
-8. Click on the "Install App to Workspace" button to install the app to your selected workspace.
+1. Provide a name and select the workspace where you want to install the app.
+1. Under the "Features" section, click on "OAuth & Permissions" to configure the app's OAuth scopes and redirect URLs.
+1. Add `channels:read`, `chat:write` and `commands` OAuth scopes in "Bot token scopes" section for your app to access the required features. Make sure to include the necessary scopes for your server to interact with Slack.
+1. Enable interactivity and set the request URL to your server's endpoint for handling Slack interactions (e.g., `https://some-generated-hash.ngrok-free.app/interact`).
+1. Under the "Features" section, click on "Slash Commands" to create three commands:
+   - `/doit` - The main command to provide description of actions by slack user and chat with AI assistant. Set the "Request URL" to `/` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/`).
+   - `/doit-clear` - The command to clear user's messages history. User's sessions together with messages are removed after 24h of idle. Still, it's recommended to run this command before changing context of the chat, to limit tokens sent to OpenAI API. Set the "Request URL" to `/clear` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/clear`).
+   - `/doit-api-keys` - The command to set API Keys and other data required for third party APIs: OpenAI API and JIRA REST API. User will be asked to provide this data if he_r session doesn't exist whenever hits `/doit` command, but still it's recommended to keep this command if user will want to change its API Keys. Set the "Request URL" to `/api-keys` path on the server, (e.g. `https://some-generated-hash.ngrok-free.app/api-keys`).
+1. Go to the "Install App" section.
+1. Click on the "Install App to Workspace" button to install the app to your selected workspace.
 
 Now, your Slack app is configured to work with the server. Start the server and test the app's functionality within Slack.
 
@@ -149,10 +159,10 @@ These dependencies are automatically installed when running `npm install`.
 If you'd like to contribute to this project, please follow these guidelines:
 
 1. Fork the repository.
-2. Create a new branch for your feature: `git checkout -b feature/your-feature-name`.
-3. Make your changes and commit them: `git commit -m "Add your feature description"`.
-4. Push the changes to your forked repository: `git push origin feature/your-feature-name`.
-5. Create a pull request explaining your changes.
+1. Create a new branch for your feature: `git checkout -b feature/your-feature-name`.
+1. Make your changes and commit them: `git commit -m "Add your feature description"`.
+1. Push the changes to your forked repository: `git push origin feature/your-feature-name`.
+1. Create a pull request explaining your changes.
 
 ## License
 
