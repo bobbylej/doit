@@ -13,10 +13,10 @@ const SessionSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true, unique: true, index: true },
     expires: { type: Number, index: true, required: true },
-    [SESSION_MODEL_API_KEYS.OPENAI_API_KEY]: { type: String, required: true },
+    [SESSION_MODEL_API_KEYS.OPENAI_API_KEY]: { type: String, required: !process.env.OPENAI_API_KEY },
     [SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID]: { type: String },
-    [SESSION_MODEL_API_KEYS.JIRA_API_KEY]: { type: String, required: true },
-    [SESSION_MODEL_API_KEYS.JIRA_HOST]: { type: String, required: true },
+    [SESSION_MODEL_API_KEYS.JIRA_API_KEY]: { type: String, required: !process.env.JIRA_API_TOKEN },
+    [SESSION_MODEL_API_KEYS.JIRA_HOST]: { type: String, required: !process.env.JIRA_HOST },
     [SESSION_MODEL_API_KEYS.JIRA_USERNAME]: { type: String, required: true },
     messages: { type: Array, default: [] },
   },

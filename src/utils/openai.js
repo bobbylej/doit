@@ -7,11 +7,15 @@ const models = {
   chatCompletionModel: process.env.OPENAI_API_CHAT_COMPLETION_MODEL,
   completionModel: process.env.OPENAI_API_COMPLETION_MODEL,
 };
+const defaultApiKeys = {
+  [SESSION_MODEL_API_KEYS.OPENAI_API_KEY]: process.env.OPENAI_API_KEY,
+  [SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID]: process.env.OPENAI_API_ORGANIZATION,
+};
 
 const getOpenAIApi = (apiKeys) => {
   const configuration = new Configuration({
-    apiKey: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY],
-    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
+    apiKey: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY] || defaultApiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY],
+    organization: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID] || defaultApiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID],
   });
   return new OpenAIApi(configuration);
 }

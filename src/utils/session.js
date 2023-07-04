@@ -7,7 +7,8 @@ import {
 import { SESSION_MODEL_API_KEYS, Session } from "../models/session.model.js";
 
 export const getSession = async (userId) => {
-  return Session.findOne({ userId }).exec();
+  const session = await Session.findOne({ userId }).exec();
+  return session;
 };
 
 export const setSession = async (userId, { messages, ...apiKeys }) => {
@@ -29,19 +30,7 @@ export const destroySession = async (userId) => {
 };
 
 export const setSessionAPIKeys = async (userId, apiKeys) => {
-  const defaultApiKeys = {
-    jiraApiKey: process.env.JIRA_API_TOKEN,
-    jiraHost: process.env.JIRA_HOST,
-    openAIApiKey: process.env.OPENAI_API_KEY,
-    openAIOrganization: process.env.OPENAI_API_ORGANIZATION,
-  }
-  return setSession(userId, {
-    [SESSION_MODEL_API_KEYS.OPENAI_API_KEY]: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_API_KEY] || defaultApiKeys.openAIApiKey,
-    [SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID]: apiKeys[SESSION_MODEL_API_KEYS.OPENAI_ORGANIZATION_ID] || defaultApiKeys.openAIOrganization,
-    [SESSION_MODEL_API_KEYS.JIRA_API_KEY]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_API_KEY] || defaultApiKeys.jiraApiKey,
-    [SESSION_MODEL_API_KEYS.JIRA_HOST]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_HOST] || defaultApiKeys.jiraHost,
-    [SESSION_MODEL_API_KEYS.JIRA_USERNAME]: apiKeys[SESSION_MODEL_API_KEYS.JIRA_USERNAME],
-  });
+  return setSession(userId, apiKeys);
 };
 
 export const validateSessionAPIKeys = (apiKeys) => {
@@ -71,7 +60,7 @@ export const pushMessageToSession = async (userId, message, role) => {
       status: 404,
       message: "Session for user not found",
     });
-  const messages = session?.messages.length
+  const messages = session?.messages?.length
     ? session?.messages
     : JIRA_OPENAI_INIT_MESSAGES;
   messages.push({ role, content: message });

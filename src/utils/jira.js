@@ -3,6 +3,11 @@ import { convertBodyForRequest } from "./api.js";
 import { PROMISE_STATUS } from "../constants/promise.constant.js";
 import { SESSION_MODEL_API_KEYS } from "../models/session.model.js";
 
+const defaultApiKeys = {
+  [SESSION_MODEL_API_KEYS.JIRA_API_KEY]: process.env.JIRA_API_TOKEN,
+  [SESSION_MODEL_API_KEYS.JIRA_HOST]: process.env.JIRA_HOST,
+};
+
 const getJiraHeaders = ({ username, apiToken }) => ({
   Authorization: `Basic ${Buffer.from(`${username}:${apiToken}`).toString(
     "base64"
@@ -14,9 +19,9 @@ const getJiraHeaders = ({ username, apiToken }) => ({
 export const jira = async (request, session) => {
   const headers = getJiraHeaders({
     username: session[SESSION_MODEL_API_KEYS.JIRA_USERNAME],
-    apiToken: session[SESSION_MODEL_API_KEYS.JIRA_API_KEY],
+    apiToken: session[SESSION_MODEL_API_KEYS.JIRA_API_KEY] || defaultApiKeys[SESSION_MODEL_API_KEYS.JIRA_API_KEY],
   });
-  const host = session[SESSION_MODEL_API_KEYS.JIRA_HOST];
+  const host = session[SESSION_MODEL_API_KEYS.JIRA_HOST] || defaultApiKeys[SESSION_MODEL_API_KEYS.JIRA_HOST];
   const url = request.query
     ? `${request.url}?${new URLSearchParams(request.query)}`
     : request.url;
