@@ -130,7 +130,7 @@ Make sure you have the following software installed before running the server:
 The main files and directories in this repository are organized as follows:
 
 - `src/` - Contains the source code files for the server.
-  - `index.js` - The entry point for the server.
+  - `server.js` - The entry point for the server.
   - Other files - Additional server logic and routes can be added in this directory.
 - `package.json` - Defines the project dependencies and scripts.
 
@@ -139,6 +139,59 @@ The main files and directories in this repository are organized as follows:
 The following scripts are available for this project:
 
 - `npm start` - Starts the server using nodemon for automatic restart on file changes.
+
+## Docker
+
+This project includes a Docker configuration that allows you to easily run the application in a containerized environment. Docker provides a consistent and reproducible environment, making it easier to deploy and share your application.
+
+### Prerequisites
+
+Before getting started with Docker, ensure that you have the following prerequisites installed on your machine:
+
+- Docker: [Installation Guide](https://docs.docker.com/get-docker/)
+
+### Build Docker Image
+
+To build the Docker image for this project, follow these steps:
+
+1. Open a terminal and navigate to the root directory of the project.
+2. Run the following command to build the Docker image:
+
+   ```bash
+   docker build -t your-image-name .
+   ```
+
+   Replace `your-image-name` with the desired name for your Docker image.
+
+### Run Docker Container
+
+Once you have built the Docker image, you can run the application in a Docker container. Use the following steps:
+
+1. Run the following command to start a Docker container from the image:
+
+   ```bash
+   docker run --env-file=.env -p 3000:3000 -d your-image-name
+   ```
+
+   Replace `your-image-name` with the name you specified when building the Docker image.
+
+2. The server will run under `http://localhost:3000`.
+
+### Customize Docker Configuration
+
+If you need to customize the Docker configuration for this project, you can modify the `Dockerfile` present in the project's root directory. The `Dockerfile` specifies the instructions for building the Docker image.
+
+### Cleanup
+
+To stop the running Docker container, use `Ctrl+C` in the terminal where the container is running.
+
+If you want to remove the Docker image from your system, run the following command:
+
+```bash
+docker image rm your-image-name
+```
+
+Replace `your-image-name` with the name of the Docker image you want to remove.
 
 ## Dependencies
 
