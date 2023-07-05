@@ -33,7 +33,7 @@ To get started with the Doit Slack app server, follow these steps:
 1. Clone the repository: `git clone https://github.com/bobbylej/doit.git`
 1. Install the dependencies: `npm install`
 1. Create a `.env` file in the root directory of the project and add your environment variables. You can refer to the `.env.example` file for the required variables.
-1. Start the server: `npm start`
+1. Start the server: `npm run dev` or `npm start` (check the difference in [Scripts](#scripts) section).
 1. The server should now be running on `http://localhost:3000`.
 1. To interact with slack app create publicity accessible URL or use development proxy like [ngrok](https://ngrok.com/).
 
@@ -138,7 +138,8 @@ The main files and directories in this repository are organized as follows:
 
 The following scripts are available for this project:
 
-- `npm start` - Starts the server using nodemon for automatic restart on file changes.
+- `npm run dev` - Starts the server using nodemon for automatic restart on file changes and reads environmental variables from `.env` file.
+- `npm start` - Starts the server for production.
 
 ## Docker
 
