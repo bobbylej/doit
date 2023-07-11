@@ -20,8 +20,8 @@ export const SESSION_API_KEYS_FIELDS = [
   },
   {
     key: SESSION_MODEL_API_KEYS.JIRA_API_KEY,
-    label: "JIRA API Key",
-    placeholder: "Provide JIRA API Key",
+    label: "JIRA API Token",
+    placeholder: "Provide JIRA API Token",
     helpText: `To get API key for JIRA please visit ${JIRA_API_KEYS_LINK}.`,
     required: !process.env.JIRA_API_TOKEN
   },

@@ -14,6 +14,7 @@ import {
   submitRequests,
 } from "./utils/action.js";
 import { connectDB } from "./utils/mongoose.js";
+import { prettyPrintJSON } from "./utils/object.js";
 
 const port = process.env.PORT || 3000;
 
@@ -28,7 +29,7 @@ app.post("/", async (req, res) => {
     chat(req.body);
     res.send();
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     res.status(500);
   }
 });
@@ -50,7 +51,7 @@ app.post("/interact", async (req, res) => {
     });
     res.send();
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     res.status(500);
   }
 });

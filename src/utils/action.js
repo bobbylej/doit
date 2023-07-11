@@ -8,6 +8,7 @@ import {
   filterIncludedRequests,
 } from "./content.js";
 import { bulkJira } from "./jira.js";
+import { prettyPrintJSON } from "./object.js";
 import { createCompletion } from "./openai.js";
 import {
   clearMessagesInSession,
@@ -47,7 +48,7 @@ export const askForAPIKeys = async (payload) => {
     const slackMessage = generateProvideAPIKeysMessage();
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
   }
 };
@@ -64,7 +65,7 @@ export const storeApiKeys = async (payload) => {
     await setSessionAPIKeys(userId, apiKeys);
     await sendWhatToDoMessage(payload);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
   }
 };
@@ -79,7 +80,7 @@ export const generateRequestsForUserInput = async (payload) => {
     const slackMessage = mergeSlackMessages(userInputMessage, requestsMessage);
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
   }
 };
@@ -92,7 +93,7 @@ export const generateRequestsForPreviousMessage = async (payload) => {
     const slackMessage = await generateRequests(text, userId);
     await sendResponseMessage(payload, slackMessage, false);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
   }
 };
@@ -118,11 +119,11 @@ export const submitRequests = async (payload) => {
       {
         attachments: slackAttachments,
       },
-      areAllRequestsIncluded
+      areAllRequestsIncluded && false
     );
     pushMessageWithResponsesToSession(userId, responses);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     const rejectedPercentage = Array.isArray(error)
       ? getRejectedPercentage(error)
       : 1;
@@ -144,7 +145,7 @@ export const clearSessionMessages = async (payload) => {
     await clearMessagesInSession(userId);
     await sendWhatToDoMessage(payload);
   } catch (error) {
-    console.error(error);
+    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
   }
 };
