@@ -68,15 +68,17 @@ export const pushMessageToSession = async (userId, message, role) => {
 };
 
 export const pushMessageWithResponsesToSession = (userId, responses) => {
-  const message = responses
-    .map((response) => {
-      return `For request: ${JSON.stringify(
-        response.value?.request || response.reason?.request
-      )}\nI got response: ${JSON.stringify(
-        response.value?.response || response.reason?.error
-      )}`;
-    })
-    .join("\n\n");
+  const convertResponseToMessage = (response) => {
+    return `For request: ${JSON.stringify(
+      response.value?.request || response.reason?.request
+    )}\nI got response: ${JSON.stringify(
+      response.value?.response || response.reason?.error
+    )}`;
+  };
+
+  const message = Array.isArray(responses) ? responses
+    .map(convertResponseToMessage)
+    .join("\n\n") : convertResponseToMessage(responses);
   return pushMessageToSession(userId, message, OPENAI_MESSAGE_ROLE.USER);
 };
 
@@ -86,3 +88,7 @@ export const clearMessagesInSession = async (userId) => {
     return setSession(userId, { messages: JIRA_OPENAI_INIT_MESSAGES });
   }
 };
+
+export const getSessions = async () => {
+  return Session.find().exec();
+}

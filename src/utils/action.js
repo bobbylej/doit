@@ -50,6 +50,7 @@ export const askForAPIKeys = async (payload) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
+    throw error;
   }
 };
 
@@ -67,6 +68,7 @@ export const storeApiKeys = async (payload) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
+    throw error;
   }
 };
 
@@ -82,6 +84,7 @@ export const generateRequestsForUserInput = async (payload) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
+    throw error;
   }
 };
 
@@ -95,6 +98,7 @@ export const generateRequestsForPreviousMessage = async (payload) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
+    throw error;
   }
 };
 
@@ -136,6 +140,7 @@ export const submitRequests = async (payload) => {
       });
     }
     pushMessageWithResponsesToSession(userId, error);
+    throw error;
   }
 };
 
@@ -147,6 +152,7 @@ export const clearSessionMessages = async (payload) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
+    throw error;
   }
 };
 

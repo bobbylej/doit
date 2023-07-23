@@ -15,10 +15,15 @@ import {
 } from "./utils/action.js";
 import { connectDB } from "./utils/mongoose.js";
 import { prettyPrintJSON } from "./utils/object.js";
+import { getSessions } from "./utils/session.js";
+import { initTrackingSDK, registerErrorHandler, registerRequestsHandler } from "./utils/error-sdk.js";
 
 const port = process.env.PORT || 3000;
 
 const app = express();
+
+initTrackingSDK(app);
+registerRequestsHandler(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -31,6 +36,7 @@ app.post("/", async (req, res) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     res.status(500);
+    throw error;
   }
 });
 
@@ -53,6 +59,7 @@ app.post("/interact", async (req, res) => {
   } catch (error) {
     console.error(prettyPrintJSON(error));
     res.status(500);
+    throw error;
   }
 });
 
@@ -65,6 +72,8 @@ app.post("/clear", (req, res) => {
   clearSessionMessages(req.body);
   res.send();
 });
+
+registerErrorHandler(app);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);

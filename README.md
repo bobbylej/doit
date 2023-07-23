@@ -78,6 +78,8 @@ The following variables are optional, but you can provide them if needed:
 
 - `JIRA_HOST` - This is an optional variable that defines the host for the Jira REST API. It should be provided in the format: *your-organization.atlassian.net*. If you don't provide this value, users will be required to provide their own API Token.
 
+- `SENTRY_DSN` - This is an optional variable that defines the Sentry DSN for error reporting. Providing this allows errors to be reported to Sentry automatically. If you don't provide this value, errors will only be logged to the console.
+
 Make sure to set these environmental variables in your `.env` file before running the project.
 
 ## Installing and Running MongoDB Locally
