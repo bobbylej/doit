@@ -7,8 +7,8 @@ import {
   convertTextMessageWithRequests,
   filterIncludedRequests,
 } from "./content.js";
+import { handleError } from "./error-handler.js";
 import { bulkJira } from "./jira.js";
-import { prettyPrintJSON } from "./object.js";
 import { createCompletion } from "./openai.js";
 import {
   clearMessagesInSession,
@@ -37,7 +37,7 @@ import {
 export const chat = async (payload) => {
   const session = await getSession(payload.user_id);
   if (session) {
-    await generateRequestsForUserInput(payload, session);
+    await generateRequestsForUserInput(payload);
   } else {
     await askForAPIKeys(payload);
   }
@@ -48,15 +48,14 @@ export const askForAPIKeys = async (payload) => {
     const slackMessage = generateProvideAPIKeysMessage();
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
-    throw error;
+    handleError(error);
   }
 };
 
 export const storeApiKeys = async (payload) => {
+  const userId = payload.user.id;
   try {
-    const userId = payload.user.id;
     const apiKeys = convertSlackStateObject(payload.state.values);
     const areApiKeysValid = validateSessionAPIKeys(apiKeys);
     if (!areApiKeysValid) {
@@ -66,39 +65,36 @@ export const storeApiKeys = async (payload) => {
     await setSessionAPIKeys(userId, apiKeys);
     await sendWhatToDoMessage(payload);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
-    throw error;
+    handleError(error, userId);
   }
 };
 
 export const generateRequestsForUserInput = async (payload) => {
+  const userId = payload.user_id || payload.user.id;
   try {
     await sendInProgressResponseMessage(payload);
     const text = payload.text;
-    const userId = payload.user_id || payload.user.id;
     const userInputMessage = convertUserInputToSlackMessage(text);
     const requestsMessage = await generateRequests(text, userId);
     const slackMessage = mergeSlackMessages(userInputMessage, requestsMessage);
     await sendResponseMessage(payload, slackMessage, true);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
-    throw error;
+    handleError(error, userId);
   }
 };
 
 export const generateRequestsForPreviousMessage = async (payload) => {
+  const userId = payload.user_id || payload.user.id;
   try {
     await sendInProgressResponseMessage(payload);
     const text = JIRA_OPENAI_GENERATE_REQUESTS_PROMPT;
-    const userId = payload.user_id || payload.user.id;
     const slackMessage = await generateRequests(text, userId);
     await sendResponseMessage(payload, slackMessage, false);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
-    throw error;
+    handleError(error, userId);
   }
 };
 
@@ -127,7 +123,7 @@ export const submitRequests = async (payload) => {
     );
     pushMessageWithResponsesToSession(userId, responses);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
+    handleError(error, userId);
     const rejectedPercentage = Array.isArray(error)
       ? getRejectedPercentage(error)
       : 1;
@@ -140,19 +136,17 @@ export const submitRequests = async (payload) => {
       });
     }
     pushMessageWithResponsesToSession(userId, error);
-    throw error;
   }
 };
 
 export const clearSessionMessages = async (payload) => {
+  const userId = payload.user_id || payload.user.id;
   try {
-    const userId = payload.user_id || payload.user.id;
     await clearMessagesInSession(userId);
     await sendWhatToDoMessage(payload);
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     await sendErrorResponseMessage(payload);
-    throw error;
+    handleError(error, userId);
   }
 };
 

@@ -14,9 +14,8 @@ import {
   submitRequests,
 } from "./utils/action.js";
 import { connectDB } from "./utils/mongoose.js";
-import { prettyPrintJSON } from "./utils/object.js";
-import { getSessions } from "./utils/session.js";
 import { initTrackingSDK, registerErrorHandler, registerRequestsHandler } from "./utils/error-sdk.js";
+import { handleError } from "./utils/error-handler.js";
 
 const port = process.env.PORT || 3000;
 
@@ -34,9 +33,8 @@ app.post("/", async (req, res) => {
     chat(req.body);
     res.send();
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     res.status(500);
-    throw error;
+    handleError(error);
   }
 });
 
@@ -57,9 +55,8 @@ app.post("/interact", async (req, res) => {
     });
     res.send();
   } catch (error) {
-    console.error(prettyPrintJSON(error));
     res.status(500);
-    throw error;
+    handleError(error);
   }
 });
 

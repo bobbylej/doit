@@ -35,3 +35,7 @@ export const registerErrorHandler = (app) => {
   if (!hasSDKKeys) return;
   app.use(Sentry.Handlers.errorHandler());
 };
+
+export const captureError = (error, context) => {
+  Sentry.captureException(error, context);
+}
