@@ -69,6 +69,16 @@ export const JIRA_OPENAI_INIT_MESSAGES = [
     content:
       '```request\n[{\n"name": "Delete task to add common links in footer",\n"url": "/rest/api/3/issue/PROJECT_KEY-46",\n"method": "DELETE"\n}]\n``` ',
   },
+  {
+    role: "user",
+    content:
+      'Update description for PROJECT_KEY-45 task',
+  },
+  {
+    role: "assistant",
+    content:
+    '```request\n{\n"url": "/rest/api/3/issue/PROJECT_KEY-45",\n"method": "PUT",\n"body": {\n"update": {\n"description": [\n{\n"set": {\n"type": "doc",\n"version": 1,\n"content": [\n{\n"type": "paragraph",\n"content": [\n{\n"type": "text",\n"text": "Updated description for PROJECT_KEY-45 task"\n}\n]\n}\n]\n}\n}\n]\n}\n}\n}\n``` ',
+  },
 ];
 
 export const JIRA_OPENAI_GENERATE_REQUESTS_PROMPT = `Generate a request or requests for that. Remember it is super important to wrap requests with ${OPENAI_REQUEST_WRAPPER.START}ARRAY WITH REQUESTS${OPENAI_REQUEST_WRAPPER.END}`;
