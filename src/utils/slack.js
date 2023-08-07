@@ -18,7 +18,10 @@ import {
 } from "../constants/slack.constant.js";
 import { prettyPrintJSON } from "./object.js";
 import { splitTextByMaxLength } from "./array.js";
-import { SESSION_API_KEYS_FIELDS } from "../constants/session.constant.js";
+import {
+  SESSION_API_KEYS_FIELDS,
+  SESSION_API_KEY_PLACEHOLDER_DEFAULT_VALUE,
+} from "../constants/session.constant.js";
 
 export const mergeSlackMessages = (...messages) => {
   return messages.reduce(
@@ -288,6 +291,16 @@ export const generateSubmitRequestsSection = (content) => {
 };
 
 export const generateProvideAPIKeysMessage = () => {
+  const generatePlaceholderText = ({ placeholder, required }) => {
+    return `${placeholder}${
+      required
+        ? " (required)"
+        : `${
+            placeholder ? " or " : ""
+          }${SESSION_API_KEY_PLACEHOLDER_DEFAULT_VALUE}`
+    }`;
+  };
+
   const generateInput = ({ key, label, placeholder, helpText, required }) => {
     return [
       {
@@ -297,7 +310,7 @@ export const generateProvideAPIKeysMessage = () => {
           action_id: key,
           placeholder: {
             type: "plain_text",
-            text: `${placeholder}${required ? " (required)" : ""}`,
+            text: generatePlaceholderText({ placeholder, required }),
             emoji: true,
           },
         },

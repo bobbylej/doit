@@ -11,26 +11,22 @@ export const getSession = async (userId) => {
   return session;
 };
 
-export const setSession = async (userId, { messages, ...apiKeys }) => {
+export const setSessionAPIKeys = async (userId, apiKeys) => {
   const session = (await getSession(userId)) || new Session({ userId });
-  if (messages) session.messages = messages;
   Object.values(SESSION_MODEL_API_KEYS).forEach((key) => {
-    if (apiKeys[key]) session[key] = apiKeys[key];
+    session[key] = apiKeys[key];
   });
   session.expires = new Date().getTime() + SESSION_MAX_AGE;
   await session.save();
   return session;
 };
 
-export const destroySession = async (userId) => {
-  const session = await getSession(userId);
-  if (session) {
-    return session.deleteOne();
-  }
-};
-
-export const setSessionAPIKeys = async (userId, apiKeys) => {
-  return setSession(userId, apiKeys);
+export const setSessionMessages = async (userId, messages) => {
+  const session = (await getSession(userId)) || new Session({ userId });
+  if (messages) session.messages = messages;
+  session.expires = new Date().getTime() + SESSION_MAX_AGE;
+  await session.save();
+  return session;
 };
 
 export const validateSessionAPIKeys = (apiKeys) => {
@@ -41,16 +37,6 @@ export const validateSessionAPIKeys = (apiKeys) => {
     return apiKeys[key];
   });
   return hasAllRequiredApiKeys;
-};
-
-export const getMessagesFromSession = async (userId) => {
-  const session = await getSession(userId);
-  if (!session)
-    return Promise.reject({
-      status: 404,
-      message: "Session for user not found",
-    });
-  return session.messages;
 };
 
 export const pushMessageToSession = async (userId, message, role) => {
@@ -64,7 +50,7 @@ export const pushMessageToSession = async (userId, message, role) => {
     ? session?.messages
     : JIRA_OPENAI_INIT_MESSAGES;
   messages.push({ role, content: message });
-  return setSession(userId, { messages });
+  return setSessionMessages(userId, messages);
 };
 
 export const pushMessageWithResponsesToSession = (userId, responses) => {
@@ -85,7 +71,7 @@ export const pushMessageWithResponsesToSession = (userId, responses) => {
 export const clearMessagesInSession = async (userId) => {
   const session = await getSession(userId);
   if (session) {
-    return setSession(userId, { messages: JIRA_OPENAI_INIT_MESSAGES });
+    return setSessionMessages(userId, []);
   }
 };
 

@@ -3,6 +3,8 @@ import { JIRA_API_KEYS_LINK, OPENAI_API_KEYS_LINK, OPENAI_ORGANIZATION_ID_LINK }
 
 export const SESSION_MAX_AGE = 24 * 60 * 60 * 1000;
 
+export const SESSION_API_KEY_PLACEHOLDER_DEFAULT_VALUE = "leave empty to use default value";
+
 export const SESSION_API_KEYS_FIELDS = [
   {
     key: SESSION_MODEL_API_KEYS.OPENAI_API_KEY,
